@@ -1,64 +1,11 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import networkx as nx
 from scipy.integrate import odeint
 import plotly.graph_objects as go
 import plotly.express as px
 
-def create_flow_diagram(units, flows):
-    """
-    Create a network diagram of patient flows
-    """
-    st.subheader("Patient Flow Diagram")
 
-    # Create graph
-    G = nx.DiGraph()
-
-    # Add nodes with colors
-    node_colors = {
-        "ED": "#ff6b6b",  # red
-        "WARD": "#4ecdc4",  # teal
-        "STEP": "#45b7d1",  # blue
-        "ICU": "#96ceb4"  # green
-    }
-
-    for unit in units:
-        G.add_node(unit, color=node_colors.get(unit, "#95a5a6"))
-
-    # Add edges
-    for a, b in flows:
-        G.add_edge(a, b)
-
-    # Create plot
-    fig, ax = plt.subplots(figsize=(10, 8))
-
-    # Set layout
-    if len(units) <= 4:
-        pos = nx.circular_layout(G)
-    else:
-        pos = nx.spring_layout(G, k=2, iterations=50)
-
-    # Draw nodes
-    colors = [G.nodes[n].get('color', '#95a5a6') for n in G.nodes]
-    nx.draw_networkx_nodes(G, pos, node_color=colors,
-                           node_size=3000, ax=ax, edgecolors='black', linewidths=2)
-
-    # Draw edges with arrows
-    nx.draw_networkx_edges(G, pos, edge_color='gray',
-                           arrows=True, arrowsize=20,
-                           arrowstyle='->', ax=ax, width=2)
-
-    # Draw labels
-    nx.draw_networkx_labels(G, pos, font_size=14,
-                            font_weight='bold', ax=ax)
-
-    ax.set_title("Hospital Patient Flow Network", fontsize=16, fontweight='bold')
-    ax.axis('off')
-
-    st.pyplot(fig)
-    plt.close()
 
 
 # =====================================================

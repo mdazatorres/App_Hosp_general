@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-from aux_functions import create_flow_diagram, solve_equilibrium, simulate_dynamics
+from aux_functions import solve_equilibrium, simulate_dynamics
 
 # Page configuration
 st.set_page_config(layout="wide", page_title="Hospital Compartment Model Builder")
@@ -561,8 +561,8 @@ with tab1:
     st.divider()
 
     # Add flow diagram
-    if len(selected_units) > 0:
-        create_flow_diagram(selected_units, flows)
+    #if len(selected_units) > 0:
+    #    create_flow_diagram(selected_units, flows)
 
 with tab2:
     st.header("Parameter Values")
