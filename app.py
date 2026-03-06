@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from scipy.integrate import odeint
 import plotly.graph_objects as go
 import plotly.express as px
 from aux_functions import create_flow_diagram, solve_equilibrium, simulate_dynamics
