@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-from aux_functions import solve_equilibrium, simulate_dynamics
+from aux_functions import solve_equilibrium, simulate_dynamics, DATA_DICTIONARY
 
 # Page configuration
 st.set_page_config(layout="wide", page_title="Hospital Compartment Model Builder")
@@ -54,18 +54,12 @@ BASE_DATA = {
 # =====================================================
 # PARAMETERS
 # =====================================================
-BASE_PARAMS = {"ED": ["sigma", "omega", "gamma", "pED_to_step", "pED_to_ward", "pED_to_ICU", "xi_step", "xi_ward", "xi_ICU"],
-    "WARD": ["ward_discharge_rate", "ward_to_ICU_rate"],
-    "STEP": ["step_discharge_rate", "step_to_ICU_rate", "step_to_ward_rate"],
-    "ICU": ["ICU_discharge_rate", "ICU_to_ward_rate", "ICU_to_step_rate"]}
-
 selected_units = get_selected_units()
 required_data = set()
 required_params = set()
 
 for u in selected_units:
     required_data.update(BASE_DATA.get(u, []))
-    required_params.update(BASE_PARAMS.get(u, []))
 
 
 # =====================================================
@@ -197,64 +191,6 @@ def build_equations(units):
     return eqs
 
 
-# =====================================================
-# CREATE FLOW DIAGRAM
-# =====================================================
-
-
-
-# =====================================================
-# GET OPERATIONAL INPUTS
-# =====================================================
-# def get_operational_inputs(required_data):
-#     st.sidebar.header("Hospital operational data")
-#
-#     mode = st.sidebar.radio(
-#         "Provide values:",["Manual entry", "Upload Excel"])
-#
-#     values = {}
-#
-#     # ===============================
-#     # EXCEL UPLOAD
-#     # ===============================
-#     if mode == "Upload Excel":
-#         file = st.sidebar.file_uploader("Upload Excel", type=["xlsx", "xls"])
-#
-#         if file:
-#             try:
-#                 df = pd.read_excel(file)
-#
-#                 # Check if dataframe has required columns
-#                 if 'variable' in df.columns and 'value' in df.columns:
-#                     for _, row in df.iterrows():
-#                         values[row["variable"]] = float(row["value"])
-#                     st.sidebar.success(f"✅ Loaded {len(values)} values")
-#                 else:
-#                     st.sidebar.error("Excel must have 'variable' and 'value' columns")
-#             except Exception as e:
-#                 st.sidebar.error(f"Error loading file: {e}")
-#
-#     # ===============================
-#     # MANUAL ENTRY
-#     # ===============================
-#     else:
-#         st.sidebar.markdown("### Enter planning values")
-#
-#         # Create columns for better organization
-#         col1, col2 = st.sidebar.columns(2)
-#
-#         for i, v in enumerate(sorted(required_data)):
-#             if i % 2 == 0:
-#                 with col1:
-#                     values[v] = st.number_input(v.replace('_', ' ').title(),
-#                                                 min_value=0.0, value=0.0, step=1.0, format="%.2f")
-#             else:
-#                 with col2:
-#                     values[v] = st.number_input(v.replace('_', ' ').title(),
-#                                                 min_value=0.0, value=0.0, step=1.0, format="%.2f")
-#
-#     return values
-
 
 # =====================================================
 # GET OPERATIONAL INPUTS
@@ -355,9 +291,7 @@ def get_operational_inputs(required_data):
                         value=default_val,
                         step=1.0,
                         format="%.2f",
-                        key=f"input_{v}"
-                    )
-
+                        key=f"input_{v}")
     return values
 
 
@@ -370,19 +304,19 @@ def compute_parameters_from_entry(values):
     """
     params = {}
 
-    # Check if we have the required data
-    if not values:
-        return get_default_parameters(selected_units)
+    # # Check if we have the required data
+    # if not values:
+    #     return get_default_parameters(selected_units)
 
     # ===== ED PARAMETERS =====
     if "ED" in selected_units:
         # Get ED values with defaults
-        mean_LOS = float(values.get('avg_ED_length_of_stay', 1))
-        mean_wait = float(values.get('avg_ED_wait_time', 0.5))
-        mean_board = float(values.get('avg_ED_boarding_time', 0.5))
-        total_arr = float(values.get('daily_ED_arrivals', 100))
-        total_lwbs = float(values.get('left_without_being_seen', 5))
-        total_adm_from_ED=float(values.get('total_adm_from_ED', 5))
+        mean_LOS = float(values.get('avg_ED_length_of_stay'))
+        mean_wait = float(values.get('avg_ED_wait_time'))
+        mean_board = float(values.get('avg_ED_boarding_time'))
+        total_arr = float(values.get('daily_ED_arrivals'))
+        total_lwbs = float(values.get('left_without_being_seen'))
+        total_adm_from_ED = float(values.get('total_adm_from_ED'))
 
         # Wait time to treatment rate
         params["sigma"] = 1.0 / max(mean_wait, 1e-6)
@@ -402,31 +336,35 @@ def compute_parameters_from_entry(values):
         else:
             p_admit = total_adm_from_ED / seen_total
 
-        # Get admission counts with defaults
-        ed_to_ward = float(values.get('ED_to_ward_admissions', total_arr * 0.3))
-        ed_to_step = float(values.get('ED_to_stepdown_admissions', total_arr * 0.1))
-        ed_to_icu = float(values.get('ED_to_ICU_admissions', total_arr * 0.05))
-
-        params["pED_to_ward"] = min(ed_to_ward / seen_total, 1.0)
-        params["pED_to_step"] = min(ed_to_step / seen_total, 1.0)
-        params["pED_to_ICU"] = min(ed_to_icu / seen_total, 1.0)
-
         # Treatment rate (service time)
         mean_service = max(mean_LOS - mean_wait - p_admit*mean_board,1e-6)
         params["gamma"] = 1.0 / mean_service
 
         # Boarding rates
-        params["xi_ward"] = 1.0 / max(mean_board, 1e-6)
+        params["xi_ward"] = 1.0 / max(mean_board, 1e-6) # check this ! what happens in the equilibrium
         params["xi_step"] = 1.0 / max(mean_board, 1e-6)
         params["xi_ICU"] = 1.0 / max(mean_board, 1e-6)
 
+
+        ##########################
+        if "WARD" in selected_units:
+            ed_to_ward = float(values.get('ED_to_ward_admissions')) # check
+            params["pED_to_ward"] = min(ed_to_ward / seen_total, 1.0)
+        if "STEP" in selected_units:
+            ed_to_step = float(values.get('ED_to_stepdown_admissions', total_arr * 0.1))
+            params["pED_to_step"] = min(ed_to_step / seen_total, 1.0)
+        if "ICU" in selected_units:
+            ed_to_icu = float(values.get('ED_to_ICU_admissions', total_arr * 0.05))
+            params["pED_to_ICU"] = min(ed_to_icu / seen_total, 1.0)
+
     # ===== WARD PARAMETERS =====
     if "WARD" in selected_units:
+
         ward_beds = float(values.get('ward_occupied_beds', 50))
         ward_beds = max(ward_beds, 1)
         # varphi
-        params["ward_discharge_rate"] = float(values.get('ward_discharges', 20)) / ward_beds
-        params["ward_to_ICU_rate"] = float(values.get('ward_to_ICU', 2)) / ward_beds
+        params["ward_discharge_rate"] = float(values.get('ward_discharges')) / ward_beds
+        params["ward_to_ICU_rate"] = float(values.get('ward_to_ICU')) / ward_beds
         params["ward_direct_admission_avg"]= values.get("ward_direct_admission")
         params["ward_transfer_admission_avg"] = values.get("ward_transfer_admission")
 
@@ -460,46 +398,6 @@ def compute_parameters_from_entry(values):
         #params["ICU_to_step_rate"] = params["ICU_to_ward_rate"] * 0.3  # Estimate
 
     return params
-
-
-def get_default_parameters(units):
-    """Return default parameters based on selected units"""
-    defaults = {}
-
-    if "ED" in units:
-        defaults.update({
-            "sigma": 2.0,  # 0.5 day wait
-            "omega": 0.2,
-            "gamma": 1.0,  # 1 day treatment
-            "pED_to_ward": 0.3,
-            "pED_to_step": 0.1,
-            "pED_to_ICU": 0.05,
-            "xi_ward": 1.0,
-            "xi_step": 1.0,
-            "xi_ICU": 1.0
-        })
-
-    if "WARD" in units:
-        defaults.update({
-            "ward_discharge_rate": 0.5,
-            "ward_to_ICU_rate": 0.05})
-
-    if "STEP" in units:
-        defaults.update({
-            "step_discharge_rate": 0.4,
-            "step_to_ICU_rate": 0.04,
-            "step_to_ward_rate": 0.1})
-
-    if "ICU" in units:
-        defaults.update({
-            "ICU_discharge_rate": 0.3,
-            "ICU_to_ward_rate": 0.2,
-            "ICU_to_step_rate": 0.05})
-
-    return defaults
-
-
-
 
 
 
@@ -543,13 +441,124 @@ with tab1:
 
     st.subheader("Required Data Inputs")
     if required_data:
-        # Display in columns
         data_list = sorted(required_data)
+
+        # Create an expander for the data dictionary
+        with st.expander("📚 Click to see detailed explanations of required data inputs", expanded=False):
+            st.markdown("""
+            <style>
+            .data-dict-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .data-dict-table th {
+                background-color: #f0f2f6;
+                padding: 10px;
+                text-align: left;
+                font-weight: bold;
+            }
+            .data-dict-table td {
+                padding: 8px 10px;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            .category-badge {
+                display: inline-block;
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 0.8em;
+                font-weight: bold;
+            }
+            .badge-ED { background-color: #ff6b6b; color: white; }
+            .badge-WARD { background-color: #4ecdc4; color: white; }
+            .badge-STEP { background-color: #45b7d1; color: white; }
+            .badge-ICU { background-color: #96ceb4; color: white; }
+            </style>
+            """, unsafe_allow_html=True)
+
+            # Create tabs for each unit to organize explanations
+            unit_tabs = st.tabs([unit for unit in selected_units])
+
+            for tab, unit in zip(unit_tabs, selected_units):
+                with tab:
+                    unit_vars = [v for v in data_list if
+                                 v in DATA_DICTIONARY and DATA_DICTIONARY[v]['category'] == unit]
+
+                    if unit_vars:
+                        # Create a table for this unit's variables
+                        table_data = []
+                        for var in sorted(unit_vars):
+                            info = DATA_DICTIONARY.get(var, {
+                                'description': 'Description pending',
+                                'unit': 'N/A',
+                                'category': unit
+                            })
+                            table_data.append({
+                                'Variable': var.replace('_', ' ').title(),
+                                'Description': info['description'],
+                                'Unit': info['unit']
+                            })
+
+                        df_dict = pd.DataFrame(table_data)
+                        st.dataframe(
+                            df_dict,
+                            use_container_width=True,
+                            column_config={
+                                "Variable": st.column_config.TextColumn("Variable", width="medium"),
+                                "Description": st.column_config.TextColumn("Description", width="large"),
+                                "Unit": st.column_config.TextColumn("Unit", width="small")
+                            }
+                        )
+                    else:
+                        st.info(f"No specific data inputs defined for {unit} unit")
+
+            st.markdown("---")
+
+            # Also show a compact view with all variables
+            st.markdown("📋 Quick reference (all variables)")
+            quick_ref_data = []
+            for var in data_list:
+                info = DATA_DICTIONARY.get(var, {
+                    'description': 'Description pending',
+                    'unit': 'N/A',
+                    'category': 'Unknown'
+                })
+                quick_ref_data.append({
+                    'Variable': var,
+                    'Category': info['category'],
+                    'Unit': info['unit']
+                })
+
+            quick_ref_df = pd.DataFrame(quick_ref_data)
+            st.dataframe(quick_ref_df, use_container_width=True)
+
+        # Original column display
+        st.markdown("**Current required data inputs:**")
         cols = st.columns(3)
         for i, data in enumerate(data_list):
-            cols[i % 3].write(f"• {data}")
+            # Get category for styling
+            category = DATA_DICTIONARY.get(data, {}).get('category', 'Unknown')
+
+            # Add colored badge based on category
+            badge_color = {
+                'ED': '🔴',
+                'WARD': '🟢',
+                'STEP': '🔵',
+                'ICU': '🟣'
+            }.get(category, '⚪')
+
+            cols[i % 3].write(f"{badge_color} {data}")
+
     else:
         st.write("No data inputs required")
+
+    # if required_data:
+    #     # Display in columns
+    #     data_list = sorted(required_data)
+    #     cols = st.columns(3)
+    #     for i, data in enumerate(data_list):
+    #         cols[i % 3].write(f"• {data}")
+    # else:
+    #     st.write("No data inputs required")
 
     st.divider()
 
@@ -641,24 +650,6 @@ with tab4:
 # SIDEBAR ADDITIONAL INFORMATION
 # =====================================================
 with st.sidebar:
-    st.divider()
-    st.markdown("### 📌 Model Information")
-    st.markdown("""
-    **Parameters:**
-    - σ (sigma): Wait time to treatment rate
-    - ω (omega): Left without being seen rate
-    - γ (gamma): Treatment completion rate
-    - ξ (xi): Boarding area transfer rate
-    - μ (mu): Unit discharge rate
-    - ρ (rho): Inter-unit transfer rate
-
-    **Units:**
-    - ED: Emergency Department
-    - WARD: General Ward
-    - STEP: Step-down/PCU
-    - ICU: Intensive Care Unit
-    """)
-
     # Show current configuration
     st.divider()
     st.markdown(f"**Current configuration:** {', '.join(selected_units) if selected_units else 'None'}")

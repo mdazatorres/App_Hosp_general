@@ -84,7 +84,10 @@ def solve_equilibrium(units, params, values):
             if u == "STEP":
                 direct = float(values.get("stepdown_direct_admission", 0))
                 transfer = float(values.get("stepdown_transfer_admission", 0))
-                boarding = params['xi_step'] * B_step
+                if 'ED' in units:
+                    boarding = params['xi_step'] * B_step
+                else:
+                    boarding = 0
                 mu = params.get("step_discharge_rate", 0)
 
                 A[i, i] += mu
@@ -101,7 +104,10 @@ def solve_equilibrium(units, params, values):
             if u == "WARD":
                 direct = float(values.get("ward_direct_admission", 0))
                 transfer = float(values.get("ward_transfer_admission", 0))
-                boarding = params['xi_ward'] * B_ward
+                if 'ED' in units:
+                    boarding = params['xi_ward'] * B_ward
+                else:
+                    boarding = 0
                 mu = params.get("ward_discharge_rate", 0)
 
                 A[i, i] += mu
@@ -124,7 +130,10 @@ def solve_equilibrium(units, params, values):
             if u == "ICU":
                 direct = float(values.get("ICU_direct_admission", 0))
                 transfer = float(values.get("ICU_transfer_admission", 0))
-                boarding = params['xi_ICU'] * B_ICU
+                if 'ED' in units:
+                    boarding = params['xi_ICU'] * B_ICU
+                else:
+                    boarding = 0
                 mu = params.get("ICU_discharge_rate", 0)
 
                 A[i, i] += mu
@@ -507,3 +516,144 @@ def simulate_dynamics(units, params, values, days=30):
     final_values = {labels[i]:f"{sol[-1,i]:.1f}" for i in range(len(labels))}
     st.write("Final values after {} days".format(days))
     st.json(final_values)
+
+
+DATA_DICTIONARY = {
+    # ED variables
+    'daily_ED_arrivals': {
+        'description': 'Average number of patients arriving to the Emergency Department per day',
+        'unit': 'patients/day',
+        'category': 'ED'
+    },
+    'left_without_being_seen': {
+        'description': 'Average number of patients who leave without being seen per day',
+        'unit': 'patients/day',
+        'category': 'ED'
+    },
+    'avg_ED_wait_time': {
+        'description': 'Average time patients wait before receiving initial treatment',
+        'unit': 'days',
+        'category': 'ED'
+    },
+    'avg_ED_boarding_time': {
+        'description': 'Average time admitted patients wait for an inpatient bed',
+        'unit': 'days',
+        'category': 'ED'
+    },
+    'avg_ED_length_of_stay': {
+        'description': 'Average total time patients spend in the ED from arrival to discharge or admission',
+        'unit': 'days',
+        'category': 'ED'
+    },
+    'total_adm_from_ED': {
+        'description': 'Average number of patients admitted to the hospital from ED per day',
+        'unit': 'patients/day',
+        'category': 'ED'
+    },
+    'ED_to_ward_admissions': {
+        'description': 'Average number of ED patients admitted to General Ward per day',
+        'unit': 'patients/day',
+        'category': 'ED'
+    },
+    'ED_to_stepdown_admissions': {
+        'description': 'Average number of ED patients admitted to Step-down unit per day',
+        'unit': 'patients/day',
+        'category': 'ED'
+    },
+    'ED_to_ICU_admissions': {
+        'description': 'Average number of ED patients admitted to ICU per day',
+        'unit': 'patients/day',
+        'category': 'ED'
+    },
+
+    # WARD variables
+    'ward_occupied_beds': {
+        'description': 'Average daily number of occupied beds in the General Ward',
+        'unit': 'beds',
+        'category': 'WARD'
+    },
+    'ward_discharges': {
+        'description': 'Average number of patients discharged from General Ward per day',
+        'unit': 'patients/day',
+        'category': 'WARD'
+    },
+    'ward_direct_admission': {
+        'description': 'Average number of patients directly admitted to General Ward (non-ED) per day',
+        'unit': 'patients/day',
+        'category': 'WARD'
+    },
+    'ward_transfer_admission': {
+        'description': 'Average number of patients transferred into General Ward from other units per day',
+        'unit': 'patients/day',
+        'category': 'WARD'
+    },
+    'ward_to_ICU': {
+        'description': 'Average number of patients transferred from General Ward to ICU per day',
+        'unit': 'patients/day',
+        'category': 'WARD'
+    },
+
+    # STEP-DOWN variables
+    'stepdown_occupied_beds': {
+        'description': 'Average daily number of occupied beds in the Step-down unit',
+        'unit': 'beds',
+        'category': 'STEP'
+    },
+    'stepdown_discharges': {
+        'description': 'Average number of patients discharged from Step-down unit per day',
+        'unit': 'patients/day',
+        'category': 'STEP'
+    },
+    'stepdown_direct_admission': {
+        'description': 'Average number of patients directly admitted to Step-down unit (non-ED) per day',
+        'unit': 'patients/day',
+        'category': 'STEP'
+    },
+    'stepdown_transfer_admission': {
+        'description': 'Average number of patients transferred into Step-down unit from other units per day',
+        'unit': 'patients/day',
+        'category': 'STEP'
+    },
+    'stepdown_to_ICU': {
+        'description': 'Average number of patients transferred from Step-down to ICU per day',
+        'unit': 'patients/day',
+        'category': 'STEP'
+    },
+    'stepdown_to_ward': {
+        'description': 'Average number of patients transferred from Step-down to General Ward per day',
+        'unit': 'patients/day',
+        'category': 'STEP'
+    },
+
+    # ICU variables
+    'ICU_occupied_beds': {
+        'description': 'Average daily number of occupied beds in the ICU',
+        'unit': 'beds',
+        'category': 'ICU'
+    },
+    'ICU_discharges': {
+        'description': 'Average number of patients discharged from ICU per day',
+        'unit': 'patients/day',
+        'category': 'ICU'
+    },
+    'ICU_direct_admission': {
+        'description': 'Average number of patients directly admitted to ICU (non-ED) per day',
+        'unit': 'patients/day',
+        'category': 'ICU'
+    },
+    'ICU_transfer_admission': {
+        'description': 'Average number of patients transferred into ICU from other units per day',
+        'unit': 'patients/day',
+        'category': 'ICU'
+    },
+    'ICU_to_stepdown': {
+        'description': 'Average number of patients transferred from ICU to Step-down per day',
+        'unit': 'patients/day',
+        'category': 'ICU'
+    },
+    'ICU_to_ward': {
+        'description': 'Average number of patients transferred from ICU to General Ward per day',
+        'unit': 'patients/day',
+        'category': 'ICU'
+    }
+}
