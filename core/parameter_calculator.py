@@ -13,6 +13,7 @@ import plotly.express as px
 # =====================================================
 def compute_parameters_from_entry(values, selected_units):
     # Force usage at the very beginning
+    MIN2DAY = 1.0 / 1440.0
 
     params = {}
     # if not values:
@@ -23,12 +24,20 @@ def compute_parameters_from_entry(values, selected_units):
     # noinspection PyUnresolvedReferences
     if "ED" in selected_units: # PyCharm specific
         # Get ED values with defaults
-        mean_LOS = float(values.get('avg_ED_length_of_stay'))
-        mean_wait = float(values.get('avg_ED_wait_time'))
-        mean_board = float(values.get('avg_ED_boarding_time'))
+        mean_LOS_min = float(values.get('avg_ED_length_of_stay'))
+        mean_wait_min = float(values.get('avg_ED_wait_time'))
+        mean_board_min = float(values.get('avg_ED_boarding_time'))
+        mean_LOS= max(mean_LOS_min * MIN2DAY, 1e-6)
+        mean_wait = max(mean_wait_min * MIN2DAY, 1e-6)
+        mean_board= max(mean_board_min * MIN2DAY, 1e-6)
+
+        #mean_board_days = max(mean_board_min * MIN2DAY, 1e-6)
+
         total_arr = float(values.get('daily_ED_arrivals'))
         total_lwbs = float(values.get('left_without_being_seen'))
         total_adm_from_ED = float(values.get('total_adm_from_ED'))
+
+        #MIN2DAY = 1.0 / 1440.0, check this
 
         # Wait time to treatment rate
         params["sigma"] = 1.0 / max(mean_wait, 1e-6)
@@ -118,24 +127,27 @@ def compute_parameters_from_excel(df, selected_units):
     Similar to your original compute_params_from_df function
     """
     params = {}
-
+    MIN2DAY = 1.0 / 1440.0
     # ===== ED PARAMETERS =====
     if "ED" in selected_units:
         # Calculate mean waiting time in days
         if 'avg_ED_wait_time' in df.columns:
-            mean_wait_days = float(df['avg_ED_wait_time'].dropna().mean())
+            mean_wait_min = float(df['avg_ED_wait_time'].dropna().mean())
+            mean_wait_days = max(mean_wait_min * MIN2DAY, 1e-6)
         else:
             mean_wait_days = 0.078  # default
 
         # Calculate mean boarding time in days
         if 'avg_ED_boarding_time' in df.columns:
-            mean_board_days = float(df['avg_ED_boarding_time'].dropna().mean())
+            mean_board_min = float(df['avg_ED_boarding_time'].dropna().mean())
+            mean_board_days = max(mean_board_min * MIN2DAY, 1e-6)
         else:
             mean_board_days = 0.676  # default
 
         # Calculate mean LOS in days
         if 'avg_ED_length_of_stay' in df.columns:
-            mean_LOS_days = float(df['avg_ED_length_of_stay'].dropna().mean())
+            mean_LOS_min = float(df['avg_ED_length_of_stay'].dropna().mean())
+            mean_LOS_days = max(mean_LOS_min * MIN2DAY, 1e-6)
         else:
             mean_LOS_days = 0.316  # default
 
@@ -311,7 +323,8 @@ def compute_parameters_from_excel(df, selected_units):
 
         # Direct and transfer admissions
         if 'ICU_direct_admission' in df.columns:
-            params["ICU_direct_admission_avg"] = float(df['ICU_direct_admission'].mean())
+            #params["ICU_direct_admission_avg"] = float(df['ICU_direct_admission'].mean())
+            params["ICU_direct_admission_avg"] = df.loc[df['ICU_direct_admission'] != 0, 'ICU_direct_admission'].median()
         else:
             params["ICU_direct_admission_avg"] = 2.09
 

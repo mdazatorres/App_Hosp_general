@@ -8,12 +8,14 @@ def initialize_session():
         'scenarios': {},
         'current_params': {},
         'data_ready': False,
-        'uploaded_df': None
+        'uploaded_df': None,
+        'uploaded_df_for_plot': None  # Add this line
     }
 
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
+
 
 def get_session_value(key: str, default: Any = None) -> Any:
     """Get a value from session state"""

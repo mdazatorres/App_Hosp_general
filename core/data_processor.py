@@ -32,6 +32,7 @@ def process_input_data(required_data: set, selected_units: list) -> Tuple[Dict, 
 def _process_uploaded_data(df: pd.DataFrame, selected_units: list) -> Tuple[Dict, Dict]:
     """Process uploaded Excel data"""
     params = compute_parameters_from_excel(df, selected_units)
+    st.session_state['uploaded_df_for_plot'] = df  # 👈 THIS IS KEY
     st.success("✅ Parameters computed successfully from uploaded data!")
     values = DEFAULT_VALUES.copy()  # For display only
     return values, params

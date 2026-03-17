@@ -5,6 +5,10 @@ from core.data_processor import process_input_data
 from utils.session_manager import initialize_session, update_current_params
 from ui.tabs import (render_model_summary_tab, render_parameters_tab, render_equilibrium_tab, render_dynamics_tab, render_sidebar_info)
 from ui.help_content import (QUICK_START_GUIDE, MODEL_CONFIGURATIONS, EQUATIONS_BY_MODEL, VARIABLE_DEFINITIONS, TIPS)
+# Add this to your imports if not already there
+from ui.visualizations import (
+    plot_units_comparison,
+    plot_utilization_metrics)
 
 # Page configuration
 st.set_page_config(layout="wide", page_title="Hospital Compartment Model Builder")
@@ -23,7 +27,7 @@ flows = get_flows(selected_units)
 # =====================================================
 # PROCESS INPUT DATA
 # =====================================================
-values, params = process_input_data(required_data, selected_units)
+values, params = process_input_data(required_data, selected_units) # here I compute the parameters from excel or manual entry
 update_current_params(params)
 
 # =====================================================
@@ -97,9 +101,9 @@ st.caption("Hospital Compartment Model Builder v2.0 | Built with Streamlit")
 # ask booarding time fo reach unit to be different in case the users know this
 # dead line april 9, 2025
 # download an excel to fill
-"""
-core/	Business logic specific to your hospital model	Parameter calculations, equilibrium solving
-data/	Data handling	File I/O, constants, validation
-ui/	User interface	Tabs, components, visualizations
-utils/	General helpers used everywhere	Session state, logging, helpers
-"""
+
+# core/	Business logic specific to your hospital model	Parameter calculations, equilibrium solving
+# data/	Data handling	File I/O, constants, validation
+# ui/	User interface	Tabs, components, visualizations
+# utils/	General helpers used everywhere	Session state, logging, helpers
+

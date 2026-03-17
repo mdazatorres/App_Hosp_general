@@ -165,9 +165,9 @@ DEFAULT_VALUES = {
         # ED defaults
         'daily_ED_arrivals': 270.82,
         'left_without_being_seen': 7.15,
-        'avg_ED_wait_time': 0.078,
-        'avg_ED_boarding_time': 0.676,
-        'avg_ED_length_of_stay': 0.316,
+        'avg_ED_wait_time': 112.59,
+        'avg_ED_boarding_time': 973.72,
+        'avg_ED_length_of_stay': 456.33,
         'total_adm_from_ED': 50.02,
         'ED_to_ward_admissions': 35.04,
         'ED_to_stepdown_admissions': 1.44,
@@ -195,8 +195,8 @@ DEFAULT_VALUES = {
         # ICU defaults
         'ICU_occupied_beds': 76.94,
         'ICU_discharges': 3.05,
-        'ICU_direct_admission': 2.09,
-        'ICU_direct_admission_avg': 2.09,
+        'ICU_direct_admission': 2.00, # I add 0.5
+        'ICU_direct_admission_avg': 2.00,
         'ICU_transfer_admission': 3.37,
         'ICU_transfer_admission_avg': 3.37,
         'ICU_to_stepdown': 0.1,

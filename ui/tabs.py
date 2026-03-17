@@ -131,6 +131,18 @@ def render_parameters_tab(params: Dict, values: Dict):
             st.info("No input values provided")
 
 
+# def render_equilibrium_tab(selected_units: List[str], params: Dict, values: Dict):
+#     """Render the Equilibrium tab"""
+#     st.header("Equilibrium Analysis")
+#
+#     if st.button("🔄 Calculate Equilibrium", type="primary"):
+#         if params and values:
+#             from core.equilibrium_solver import solve_equilibrium
+#             equilibrium = solve_equilibrium(selected_units, params, values)
+#         else:
+#             st.warning("Please provide input values first")
+
+
 def render_equilibrium_tab(selected_units: List[str], params: Dict, values: Dict):
     """Render the Equilibrium tab"""
     st.header("Equilibrium Analysis")
@@ -139,6 +151,27 @@ def render_equilibrium_tab(selected_units: List[str], params: Dict, values: Dict
         if params and values:
             from core.equilibrium_solver import solve_equilibrium
             equilibrium = solve_equilibrium(selected_units, params, values)
+
+            # 👇 ADD THIS PART - Show plots if we have uploaded data
+            if equilibrium and st.session_state.get('uploaded_df_for_plot') is not None:
+                from ui.visualizations import (plot_units_comparison, plot_utilization_metrics)
+
+                df = st.session_state['uploaded_df_for_plot']
+
+                st.divider()
+                st.subheader("📊 Comparison with Historical Data")
+
+                # Create tabs for different visualizations
+                viz_tab1, viz_tab2 = st.tabs(["📈 Occupancy Trends", "📋 Summary Metrics"])
+
+                with viz_tab1:
+                    plot_units_comparison(df, equilibrium, selected_units)
+
+                with viz_tab2:
+                    plot_utilization_metrics(df, equilibrium, selected_units)
+
+            elif equilibrium:
+                st.info("ℹ️ Upload Excel data to see comparison with historical trends")
         else:
             st.warning("Please provide input values first")
 
