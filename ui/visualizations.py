@@ -80,22 +80,6 @@ def plot_units_comparison(
             ),
             row=i, col=1
         )
-
-        # Add horizontal line for mean of historical data
-        mean_value = df[column].mean()
-        fig.add_trace(
-            go.Scatter(
-                x=[df.index[0], df.index[-1]] if 'Date' not in df.columns else [df['Date'].iloc[0],
-                                                                                df['Date'].iloc[-1]],
-                y=[mean_value, mean_value],
-                mode='lines',
-                name=f'{unit} Mean',
-                line=dict(color='green', width=2, dash='dot'),
-                showlegend=True
-            ),
-            row=i, col=1
-        )
-
         # Update y-axis label
         fig.update_yaxes(title_text="Patients", row=i, col=1)
 
