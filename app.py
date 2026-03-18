@@ -33,27 +33,27 @@ update_current_params(params)
 # =====================================================
 # CREATE TABS
 # =====================================================
-tab1, tab2, tab3, tab4,  tab5 = st.tabs([
-    "📋 Model Summary", "📊 Parameter Values",
-    "⚖️ Equilibrium", "📑 Scenario Analysis", "❓ Help"])
+tab1, tab2, tab3,   tab4 = st.tabs([
+    "📋 Model Summary","⚖️ Equilibrium", "📑 Scenario Analysis", "❓ Help"])
 
 with tab1:
     render_model_summary_tab(selected_units, flows, required_data)
 
-with tab2:
-    render_parameters_tab(params, values)
+#with tab2:
+#    render_parameters_tab(params, values)
+# This just for test any mistake
 
-with tab3:
+with tab2:
     render_equilibrium_tab(selected_units, params, values)
 
 # with tab4:
 #     render_dynamics_tab(selected_units, params, values)
 
-with tab4:
+with tab3:
     st.header("Scenario Analysis")
     st.info("🚧 Scenario analysis coming soon!")
 
-with tab5:
+with tab4:
     st.header("Help & Documentation")
 
     help_tabs = st.tabs(["🚀 Quick Start", "📐 Model Configurations",
@@ -87,23 +87,4 @@ st.divider()
 st.caption("Hospital Compartment Model Builder v2.0 | Built with Streamlit")
 
 
-
-
-
-# # Put a message explain we are computing the equilibrium alonside with the assumtions we are doing
-# # 4) if there is data plot along the equilibrium
-# # 4) Add scenarios option, one time the equilibrium is computed, we can make scenarios as we did for UC Davis
-# if something is missing in the excel communicate exact what we are missing
-# make a test in paramaters and equilibirum to be sure all is work ok
-# check the equilibrium how is computed in the excel file
-# changes days to minute
-# clarify what mean the step down unit
-# ask booarding time fo reach unit to be different in case the users know this
-# dead line april 9, 2025
-# download an excel to fill
-
-# core/	Business logic specific to your hospital model	Parameter calculations, equilibrium solving
-# data/	Data handling	File I/O, constants, validation
-# ui/	User interface	Tabs, components, visualizations
-# utils/	General helpers used everywhere	Session state, logging, helpers
 
