@@ -34,17 +34,17 @@ DATA_DICTIONARY = {
     },
     'avg_ED_wait_time': {
         'description': 'Average time patients wait before receiving initial treatment',
-        'unit': 'days',
+        'unit': 'minutes',
         'category': 'ED'
     },
     'avg_ED_boarding_time': {
         'description': 'Average time admitted patients wait for an inpatient bed',
-        'unit': 'days',
+        'unit': 'minutes',
         'category': 'ED'
     },
     'avg_ED_length_of_stay': {
         'description': 'Average total time patients spend in the ED from arrival to discharge or admission',
-        'unit': 'days',
+        'unit': 'minutes',
         'category': 'ED'
     },
     'total_adm_from_ED': {
