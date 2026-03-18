@@ -8,7 +8,7 @@ This script serves two purposes:
 The computed values here (parameters and equilibrium) can be used to verify
 that the app is working correctly.
 """
-
+# lunes 6:40
 
 import numpy as np
 import pandas as pd
