@@ -33,9 +33,9 @@ update_current_params(params)
 # =====================================================
 # CREATE TABS
 # =====================================================
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4,  tab5 = st.tabs([
     "📋 Model Summary", "📊 Parameter Values",
-    "⚖️ Equilibrium", "📈 Dynamics", "📑 Scenario Analysis", "❓ Help"])
+    "⚖️ Equilibrium", "📑 Scenario Analysis", "❓ Help"])
 
 with tab1:
     render_model_summary_tab(selected_units, flows, required_data)
@@ -46,14 +46,14 @@ with tab2:
 with tab3:
     render_equilibrium_tab(selected_units, params, values)
 
-with tab4:
-    render_dynamics_tab(selected_units, params, values)
+# with tab4:
+#     render_dynamics_tab(selected_units, params, values)
 
-with tab5:
+with tab4:
     st.header("Scenario Analysis")
     st.info("🚧 Scenario analysis coming soon!")
 
-with tab6:
+with tab5:
     st.header("Help & Documentation")
 
     help_tabs = st.tabs(["🚀 Quick Start", "📐 Model Configurations",
