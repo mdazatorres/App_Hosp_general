@@ -1,5 +1,5 @@
 #from data_params import *
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from scipy.linalg import expm
 import numpy as np
 import streamlit as st
@@ -600,7 +600,7 @@ def run_example_test():
         print(f"    {unit}: {val:.2f}")
 
     # Create simple matplotlib plot for validation
-    try:
+    #try:
         #uncomente this to see the plot
         # import matplotlib.pyplot as plt
         #
@@ -618,13 +618,13 @@ def run_example_test():
         #         for t_on, t_off, amp in surge_specs[unit]:
         #             axes[i].axvspan(t_on, t_off, alpha=0.2, color='red')
 
-        axes[-1].set_xlabel('Time (days)')
-        plt.suptitle('Surge Response Test')
-        plt.tight_layout()
-        plt.show()
+        # axes[-1].set_xlabel('Time (days)')
+        # plt.suptitle('Surge Response Test')
+        # plt.tight_layout()
+        # plt.show()
 
-    except ImportError:
-        print("\nMatplotlib not available for plotting")
+    # except ImportError:
+    #     print("\nMatplotlib not available for plotting")
 
     print("\n" + "=" * 60)
     print("TEST COMPLETE - Module ready for integration")
