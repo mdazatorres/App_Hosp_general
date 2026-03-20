@@ -601,21 +601,22 @@ def run_example_test():
 
     # Create simple matplotlib plot for validation
     try:
-        import matplotlib.pyplot as plt
-
-        fig, axes = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
-
-        for i, unit in enumerate(results['unit_order']):
-            axes[i].plot(results['times'], results['x_ts'][:, i], 'b-', linewidth=2, label='Response')
-            axes[i].axhline(y=results['x0'][i], color='r', linestyle='--', label='Baseline')
-            axes[i].set_ylabel(f'{unit} (patients)')
-            axes[i].legend()
-            axes[i].grid(alpha=0.3)
-
-            # Shade surge periods
-            if unit in surge_specs:
-                for t_on, t_off, amp in surge_specs[unit]:
-                    axes[i].axvspan(t_on, t_off, alpha=0.2, color='red')
+        #uncomente this to see the plot
+        # import matplotlib.pyplot as plt
+        #
+        # fig, axes = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
+        #
+        # for i, unit in enumerate(results['unit_order']):
+        #     axes[i].plot(results['times'], results['x_ts'][:, i], 'b-', linewidth=2, label='Response')
+        #     axes[i].axhline(y=results['x0'][i], color='r', linestyle='--', label='Baseline')
+        #     axes[i].set_ylabel(f'{unit} (patients)')
+        #     axes[i].legend()
+        #     axes[i].grid(alpha=0.3)
+        #
+        #     # Shade surge periods
+        #     if unit in surge_specs:
+        #         for t_on, t_off, amp in surge_specs[unit]:
+        #             axes[i].axvspan(t_on, t_off, alpha=0.2, color='red')
 
         axes[-1].set_xlabel('Time (days)')
         plt.suptitle('Surge Response Test')
