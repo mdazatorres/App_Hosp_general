@@ -441,44 +441,74 @@ def plot_surge_response(results: Dict[str, Any]):
 
     st.plotly_chart(fig, use_container_width=True)
 
+
+
+
+def summary_metrics_surge_response(results: Dict[str, Any]):
+    """
+    Plot surge response results using Plotly.
+
+    Parameters:
+    -----------
+    results : Dict
+        Results from transient_response_for_multi_surge
+    """
+    times = results['times']
+    x_ts = results['x_ts']
+    x0 = results['x0']
+    unit_order = results['unit_order']
+
+
+    # Calculate peak demands
+    extra_beds_over_time = x_ts - x0
+    peak_extra_beds_total = float(np.max(np.sum(extra_beds_over_time, axis=1)))
+
+    peak_extra_beds_per_comp = {}
+    for i, unit in enumerate(unit_order):
+        peak_extra_beds_per_comp[unit] = float(np.max(extra_beds_over_time[:, i]))
+
+
     # Display metrics
-    col1, col2, col3 = st.columns(3)
+    col1, col2= st.columns(2)
     with col1:
-        st.metric("Total Extra Bed-Days", f"{results['extra_beddays_total']:.1f}")
+        st.write("### 🏥 Peak Additional Bed Requirements")
+        st.metric("Total Extra Beds Needed", f"{peak_extra_beds_total:.1f}", delta=None)
+        st.markdown("**By unit:**")
+        for unit in unit_order:
+            peak = peak_extra_beds_per_comp[unit]
+            baseline = x0[unit_order.index(unit)]
+            pct_increase = (peak / baseline * 100) if baseline > 0 else 0
+            st.markdown(f"- **{unit}**: {peak:.1f} extra "f"({pct_increase:.0f}% above baseline)")
+
+    # with col2:
+    #     max_excess = np.max(np.sum(x_ts - x0, axis=1))
+    #     st.metric("Peak Excess Patients", f"{max_excess:.1f}")
 
     with col2:
-        max_excess = np.max(np.sum(x_ts - x0, axis=1))
-        st.metric("Peak Excess Patients", f"{max_excess:.1f}")
+        st.write("### 📊 Cumulative Bed-Days (Total Workload)")
 
-    with col3:
-        # Time to return to baseline (within 5%)
-        threshold = 0.05 * np.sum(x0)
-        close_enough = np.where(np.sum(np.abs(x_ts - x0), axis=1) < threshold)[0]
-        if len(close_enough) > 0:
-            recovery_time = times[close_enough[0]]
-        else:
-            recovery_time = times[-1]
-        st.metric("Recovery Time (days)", f"{recovery_time:.1f}")
+        st.metric("Total Extra Bed-Days", f"{results['extra_beddays_total']:.1f}")
 
-        st.markdown("### 🏥 Peak Additional Bed Requirements")
-        st.metric("Total Extra Beds Needed", f"{peak_extra_beds_total:.1f}", delta=None )
-
-    st.markdown("**By unit:**")
-    for unit in unit_order:
-        peak = peak_extra_beds_per_comp[unit]
-        baseline = x0[unit_order.index(unit)]
-        pct_increase = (peak / baseline * 100) if baseline > 0 else 0
-        st.markdown(f"- **{unit}**: {peak:.1f} extra "f"({pct_increase:.0f}% above baseline)")
+        st.markdown("**By unit:**")
+        for unit in unit_order:
+            st.write(f"- {unit}: {results['extra_beddays_per_comp'][unit]:.1f}")
 
 
 
-    # Extra bed-days per unit
-    st.subheader("📊 Extra Bed-Days by Unit")
-    df_extra = pd.DataFrame([
-        {"Unit": unit, "Extra Bed-Days": f"{results['extra_beddays_per_comp'][unit]:.1f}"}
-        for unit in unit_order
-    ])
-    st.dataframe(df_extra, use_container_width=True)
+
+
+    # Time to return to baseline (within 5%)
+    # threshold = 0.05 * np.sum(x0)
+    # close_enough = np.where(np.sum(np.abs(x_ts - x0), axis=1) < threshold)[0]
+    # if len(close_enough) > 0:
+    #     recovery_time = times[close_enough[0]]
+    # else:
+    #     recovery_time = times[-1]
+    # st.metric("Recovery Time (days)", f"{recovery_time:.1f}")
+    #
+    # # Extra bed-days per unit
+
+    # all the information here is correct I need to organize it
 
 
 # =============================================================================

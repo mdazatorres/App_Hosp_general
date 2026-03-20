@@ -60,7 +60,7 @@ with tab3:
     if not params or not values or not selected_units:
         st.warning("Please provide input values first")
     else:
-        from core.surge_analysis import transient_response_for_multi_surge, plot_surge_response
+        from core.surge_analysis import transient_response_for_multi_surge, plot_surge_response, summary_metrics_surge_response
 
         # Check if we have inpatient units
         inpatient_units = [u for u in ['STEP', 'WARD', 'ICU'] if u in selected_units]
@@ -113,14 +113,16 @@ with tab3:
                     "Simulation end time (days)",
                     min_value=10.0, max_value=365.0, value=50.0
                 )
-            with col2:
-                dt = st.number_input(
-                    "Time step (days)",
-                    min_value=0.1, max_value=5.0, value=0.5
-                )
+
+            # with col2:
+            #     dt =  st.number_input(
+            #         "Time step (days)",
+            #         min_value=0.1, max_value=5.0, value=0.5
+            #     )
 
             # Run button
             if st.button("🚀 Run Surge Analysis", type="primary"):
+                dt=1
                 if surge_specs:
                     times = np.arange(0, t_end + dt, dt)
 
@@ -133,6 +135,7 @@ with tab3:
                         st.error(results['error'])
                     else:
                         plot_surge_response(results)
+                        summary_metrics_surge_response(results)
 
                         # Store results in session state
                         st.session_state['last_surge_results'] = results
