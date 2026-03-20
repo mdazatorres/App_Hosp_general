@@ -643,17 +643,6 @@ if __name__ == "__main__":
     # Run example test when script is executed directly
     run_example_test()
 
-
-############ Solving with my previous implementation
-
-
-
-
-
-
-
-
-
 # Baseline equilibrium:
 #   WARD: 395.83
 #   STEP: 9.37
