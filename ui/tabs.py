@@ -54,6 +54,7 @@ def _render_data_dictionary(required_data: set):
         cols[i % 3].write(f"{badge} {data}")
 
 
+
 def _render_data_dictionary_tabs(data_list: List[str]):
     """Render tabs for each unit"""
     # Get unique categories from data_list
@@ -75,8 +76,7 @@ def _render_data_dictionary_tabs(data_list: List[str]):
                          and DATA_DICTIONARY[v]['category'] == category]
 
             if unit_vars:
-                table_data = [{
-                    'Variable': var.replace('_', ' ').title(),
+                table_data = [{'Variable': var.replace('_', ' ').title(),
                     'Description': DATA_DICTIONARY[var]['description'],
                     'Unit': DATA_DICTIONARY[var]['unit']
                 } for var in sorted(unit_vars)]
@@ -87,9 +87,7 @@ def _render_data_dictionary_tabs(data_list: List[str]):
                     column_config={
                         "Variable": st.column_config.TextColumn(width="medium"),
                         "Description": st.column_config.TextColumn(width="large"),
-                        "Unit": st.column_config.TextColumn(width="small")
-                    }
-                )
+                        "Unit": st.column_config.TextColumn(width="small")})
             else:
                 st.info(f"No variables defined for {category}")
 
@@ -102,47 +100,6 @@ def _render_ode_system(units: List[str]):
         st.latex(eq)
 
 
-def render_parameters_tab(params: Dict, values: Dict):
-    """Render the Parameters tab"""
-    st.header("Parameter Values")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.subheader("Computed Parameters")
-        if params:
-            df = pd.DataFrame([
-                {"Parameter": k, "Value": f"{v:.4f}"}
-                for k, v in sorted(params.items())
-            ])
-            st.dataframe(df, use_container_width=True)
-        else:
-            st.info("No parameters computed yet")
-
-    with col2:
-        st.subheader("Input Values")
-        if values:
-            df = pd.DataFrame([
-                {"Variable": k, "Value": f"{v:.2f}"}
-                for k, v in sorted(values.items())
-            ])
-            st.dataframe(df, use_container_width=True)
-        else:
-            st.info("No input values provided")
-
-
-# def render_equilibrium_tab(selected_units: List[str], params: Dict, values: Dict):
-#     """Render the Equilibrium tab"""
-#     st.header("Equilibrium Analysis")
-#
-#     if st.button("🔄 Calculate Equilibrium", type="primary"):
-#         if params and values:
-#             from core.equilibrium_solver import solve_equilibrium
-#             equilibrium = solve_equilibrium(selected_units, params, values)
-#         else:
-#             st.warning("Please provide input values first")
-
-
 def render_equilibrium_tab(selected_units: List[str], params: Dict, values: Dict):
     """Render the Equilibrium tab"""
     st.header("Equilibrium Analysis")
@@ -152,7 +109,7 @@ def render_equilibrium_tab(selected_units: List[str], params: Dict, values: Dict
             from core.equilibrium_solver import solve_equilibrium
             equilibrium = solve_equilibrium(selected_units, params, values)
 
-            # 👇 ADD THIS PART - Show plots if we have uploaded data
+            # ADD THIS PART - Show plots if we have uploaded data
             if equilibrium and st.session_state.get('uploaded_df_for_plot') is not None:
                 from ui.visualizations import (plot_units_comparison, plot_utilization_metrics)
 
@@ -180,10 +137,7 @@ def render_dynamics_tab(selected_units: List[str], params: Dict, values: Dict):
     """Render the Dynamics tab"""
     st.header("Time Dynamics Simulation")
 
-    simulation_days = st.number_input(
-        "Simulation days",
-        min_value=1, max_value=365, value=30
-    )
+    simulation_days = st.number_input("Simulation days", min_value=1, max_value=365, value=30)
 
     if st.button("▶️ Run Simulation", type="primary"):
         if params and values and len(selected_units) > 0:
