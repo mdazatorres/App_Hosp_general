@@ -116,9 +116,7 @@ After following these steps, you can:
 
 
 
-MODEL_INFO = r"""
-
-### 🏥 Hospital Surge Capacity Model
+MODEL_INFO = r""" ### 🏥 Hospital Surge Capacity Model
 
 The main purpose of this work is to **predict bed requirements during surge events**. 
 This model allows us to simulate hospital dynamics under routine conditions and quantify how
