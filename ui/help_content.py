@@ -73,7 +73,7 @@ For each inpatient unit (WARD, STEP, ICU), you can define **multiple surge event
 | **End Day** | When the surge ends (in days) |
 | **Amplitude** | How many extra patients per day are added to direct admissions |
 
-> 💡 **Tip**: Multiple surges can overlap, and their effects are summed linearly. You can define up to 5 surge events per unit.
+💡 **Tip**: Multiple surges can overlap, and their effects are summed linearly. You can define up to 5 surge events per unit.
 
 ##### Interpreting the Results
 
