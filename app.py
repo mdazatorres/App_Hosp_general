@@ -4,7 +4,7 @@ from core.data_manager import get_flows, get_selected_units, get_required_data
 from core.data_processor import process_input_data
 from utils.session_manager import initialize_session, update_current_params
 from ui.tabs import (render_model_summary_tab, render_parameters_tab, render_equilibrium_tab, render_dynamics_tab, render_sidebar_info)
-from ui.help_content import (QUICK_START_GUIDE, MODEL_CONFIGURATIONS, EQUATIONS_BY_MODEL, VARIABLE_DEFINITIONS, TIPS)
+from ui.help_content import (QUICK_START_GUIDE, MODEL_INFO)
 import numpy as np
 # Add this to your imports if not already there
 from ui.visualizations import (
@@ -12,8 +12,8 @@ from ui.visualizations import (
     plot_utilization_metrics)
 
 # Page configuration
-st.set_page_config(layout="wide", page_title="Hospital Compartment Model Builder")
-st.title("🏥 Hospital Compartment Model Builder")
+st.set_page_config(layout="wide", page_title="Hospital Surge Capacity Planner")
+st.title("🏥 Hospital Surge Capacity Planner")
 
 # Initialize session state
 initialize_session()
@@ -35,7 +35,7 @@ update_current_params(params)
 # CREATE TABS
 # =====================================================
 tab1, tab2, tab3,   tab4 = st.tabs([
-    "📋 Model Summary","⚖️ Equilibrium", "📑 Scenario Analysis", "❓ Help"])
+    "📋 Model Summary","⚖️ Equilibrium", "📑 Scenario Analysis", "📚 Documentation"])
 
 with tab1:
     render_model_summary_tab(selected_units, flows, required_data)
@@ -87,17 +87,17 @@ with tab3:
                         col1, col2, col3 = st.columns(3)
                         with col1:
                             t_on = st.number_input(
-                                f"Start day", min_value=0.0, value=5.0 + j * 10,
+                                f"Start day", min_value=0.0, value=5.0 + j * 10, step=1.0,
                                 key=f"t_on_{unit}_{j}"
                             )
                         with col2:
                             t_off = st.number_input(
-                                f"End day", min_value=t_on + 1, value=t_on + 5,
+                                f"End day", min_value=t_on + 1, value=t_on + 5,step=1.0,
                                 key=f"t_off_{unit}_{j}"
                             )
                         with col3:
                             amp = st.number_input(
-                                f"Amplitude", min_value=0.0, value=5.0,
+                                f"Amplitude", min_value=0.0, value=5.0,step=1.0,
                                 key=f"amp_{unit}_{j}"
                             )
                         unit_surges.append((t_on, t_off, amp))
@@ -143,25 +143,24 @@ with tab3:
                     st.warning("Please define at least one surge event")
 
 with tab4:
-    st.header("Help & Documentation")
+    st.header("Documentation")
 
-    help_tabs = st.tabs(["🚀 Quick Start", "📐 Model Configurations",
-                         "📝 Equations", "📊 Variables", "💡 Tips"])
+    help_tabs = st.tabs(["🚀 Quick Start", "📚 Model Documentation"])
 
     with help_tabs[0]:
         st.markdown(QUICK_START_GUIDE)
     with help_tabs[1]:
-        st.markdown(MODEL_CONFIGURATIONS)
-    with help_tabs[2]:
-        st.markdown(EQUATIONS_BY_MODEL)
-        # Add your current equations
-        st.markdown("### Your Current Equations")
-        for eq in build_equations(selected_units):
-            st.latex(eq)
-    with help_tabs[3]:
-        st.markdown(VARIABLE_DEFINITIONS)
-    with help_tabs[4]:
-        st.markdown(TIPS)
+        st.markdown(MODEL_INFO, unsafe_allow_html=True)
+    # with help_tabs[2]:
+    #     st.markdown(EQUATIONS_BY_MODEL)
+    #     # Add your current equations
+    #     st.markdown("### Your Current Equations")
+    #     for eq in build_equations(selected_units):
+    #         st.latex(eq)
+    # with help_tabs[3]:
+    #     st.markdown(VARIABLE_DEFINITIONS)
+    # with help_tabs[4]:
+    #     st.markdown(TIPS)
 
 
 # =====================================================

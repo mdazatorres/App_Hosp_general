@@ -349,13 +349,15 @@ def transient_response_for_multi_surge(units: List[str], params: Dict, values: D
                 z += expm(J * (t - t_off)).dot(z_T)
 
         x_ts[k] = x0 + z
-
+    #------------------ solve this trapz instead trapezoid
     # Calculate extra bed-days
     extra_beddays_total = np.trapezoid(np.sum(x_ts - x0, axis=1), times)
+    #extra_beddays_total = np.trapz(np.sum(x_ts - x0, axis=1), times)
 
     extra_beddays_per_comp = {}
     for i, unit in enumerate(inpatient_units):
         extra_beddays_per_comp[unit] = np.trapezoid(x_ts[:, i] - x0[i], times)
+        #extra_beddays_per_comp[unit] = np.trapz(x_ts[:, i] - x0[i], times)
 
     # Pack results
     results = {
@@ -387,8 +389,6 @@ def plot_surge_response(results: Dict[str, Any]):
 
     # Calculate peak demands
     extra_beds_over_time = x_ts - x0
-    peak_extra_beds_total = float(np.max(np.sum(extra_beds_over_time, axis=1)))
-
     peak_extra_beds_per_comp = {}
     for i, unit in enumerate(unit_order):
         peak_extra_beds_per_comp[unit] = float(np.max(extra_beds_over_time[:, i]))
@@ -453,16 +453,37 @@ def summary_metrics_surge_response(results: Dict[str, Any]):
     results : Dict
         Results from transient_response_for_multi_surge
     """
+    # --------------- Compute transient system response to multiple surge events ------
     times = results['times']
-    x_ts = results['x_ts']
-    x0 = results['x0']
+    x_ts = results['x_ts']  # Time series of state variables (beds by unit)
+    x0 = results['x0']      # Baseline equilibrium (no-surge steady state)
     unit_order = results['unit_order']
 
 
     # Calculate peak demands
-    extra_beds_over_time = x_ts - x0
-    peak_extra_beds_total = float(np.max(np.sum(extra_beds_over_time, axis=1)))
+    extra_beds_over_time = x_ts - x0 # Compute daily excess bed occupancy relative to baseline
 
+
+    # -------------- Apply threshold to the time series output --------------
+    # We define "active surge impact" as any time when at least one unit exceeds the baseline by more than the specified threshold.
+
+    threshold = 0.1  # minimum extra beds considered meaningful
+    max_extra = np.max(extra_beds_over_time, axis=1) # Maximum excess occupancy across units at each time point
+    active_idx = np.where(max_extra >= threshold)[0] # Indices where the system is still above the threshold
+
+    # Last time index with meaningful surge impact
+    if len(active_idx) > 0:
+        t_cut = active_idx[-1] + 1
+    else:
+        t_cut = 1   # No meaningful deviation from equilibrium detected
+    # Truncate the time series to exclude periods where excess occupancy is negligible (< threshold).
+    # All downstream workload and cost calculations are based on this truncated series.
+    # we haven't yet used these for plot. check if we want to add them
+    times_plot = times[:t_cut]
+    x_ts_plot= x_ts[:t_cut]
+
+
+    peak_extra_beds_total = float(np.max(np.sum(extra_beds_over_time, axis=1)))
     peak_extra_beds_per_comp = {}
     for i, unit in enumerate(unit_order):
         peak_extra_beds_per_comp[unit] = float(np.max(extra_beds_over_time[:, i]))
@@ -487,15 +508,20 @@ def summary_metrics_surge_response(results: Dict[str, Any]):
     with col2:
         st.write("### 📊 Cumulative Bed-Days (Total Workload)")
 
-        st.metric("Total Extra Bed-Days", f"{results['extra_beddays_total']:.1f}")
+        # st.metric("Total Extra Bed-Days", f"{results['extra_beddays_total']:.1f}")
+        # st.markdown("**By unit:**")
+        # for unit in unit_order:
+        #     st.write(f"- {unit}: {results['extra_beddays_per_comp'][unit]:.1f}")
 
+
+        extra_beds_over_time_cut = extra_beds_over_time[:t_cut]
+        extra_beddays_per_comp_cut = {comp: extra_beds_over_time_cut[:, j].sum() for j, comp in enumerate(unit_order)}
+        extra_beddays_total_cut = sum(extra_beddays_per_comp_cut.values()) # Total system-wide bed-days
+
+        st.metric("Extra Bed-Days (Total)", f"{extra_beddays_total_cut:.1f}")
         st.markdown("**By unit:**")
-        for unit in unit_order:
-            st.write(f"- {unit}: {results['extra_beddays_per_comp'][unit]:.1f}")
-
-
-
-
+        for unit, beddays in extra_beddays_per_comp_cut.items():
+            st.write(f"- {unit}: {beddays:.1f} bed-days")
 
     # Time to return to baseline (within 5%)
     # threshold = 0.05 * np.sum(x0)

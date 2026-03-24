@@ -8,7 +8,7 @@ from core.constants import DATA_DICTIONARY
 
 def render_model_summary_tab(selected_units: List[str], flows: List[tuple], required_data: set):
     """Render the Model Summary tab"""
-    st.header("Model Summary")
+    #st.header("Model Summary")
 
     col1, col2 = st.columns(2)
 
