@@ -20,7 +20,7 @@ In the left sidebar, check the boxes for the units you want to include in your m
 
 ✅ **Once you've selected your units**, the app automatically determines which parameters are required for your specific configuration.
 
-💡 **Tip**: Not sure which configuration to choose? Visit the **Model Documentation** tab to explore all 12 possible model configurations and find the one that best fits your analysis needs.
+###### 💡 *Tip*: Not sure which configuration to choose? Visit the **Model Documentation** tab to explore all 12 possible model configurations and find the one that best fits your analysis needs.
 ---
 
 #### Step 2: Enter Your Data

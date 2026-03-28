@@ -351,13 +351,13 @@ def transient_response_for_multi_surge(units: List[str], params: Dict, values: D
         x_ts[k] = x0 + z
     #------------------ solve this trapz instead trapezoid
     # Calculate extra bed-days
-    #extra_beddays_total = np.trapezoid(np.sum(x_ts - x0, axis=1), times)
-    extra_beddays_total = np.trapz(np.sum(x_ts - x0, axis=1), times)
+    extra_beddays_total = np.trapezoid(np.sum(x_ts - x0, axis=1), times)
+    #extra_beddays_total = np.trapz(np.sum(x_ts - x0, axis=1), times)
 
     extra_beddays_per_comp = {}
     for i, unit in enumerate(inpatient_units):
-        #extra_beddays_per_comp[unit] = np.trapezoid(x_ts[:, i] - x0[i], times)
-        extra_beddays_per_comp[unit] = np.trapz(x_ts[:, i] - x0[i], times)
+        extra_beddays_per_comp[unit] = np.trapezoid(x_ts[:, i] - x0[i], times)
+        #extra_beddays_per_comp[unit] = np.trapz(x_ts[:, i] - x0[i], times)
 
     # Pack results
     results = {
@@ -372,7 +372,8 @@ def transient_response_for_multi_surge(units: List[str], params: Dict, values: D
 
     return results
 
-def plot_surge_response(results: Dict[str, Any]):
+
+def plot_surge_response1(results: Dict[str, Any]):
     """
     Plot surge response results using Plotly.
 
@@ -399,9 +400,12 @@ def plot_surge_response(results: Dict[str, Any]):
         cols=1,
         subplot_titles=[f"{unit} Unit Response" for unit in unit_order],
         vertical_spacing=0.1,
-        shared_xaxes=True)
+        shared_xaxes=True,
+        specs=[[{"secondary_y": True}] for _ in range(len(unit_order))]  # Add secondary y-axis for each row
+    )
 
     colors = {'WARD': '#4ecdc4', 'STEP': '#45b7d1', 'ICU': '#96ceb4'}
+    extra_colors = {'WARD': '#2c8c7a', 'STEP': '#2a6f8a', 'ICU': '#5a8a6e'}  # Darker shade
 
     for i, unit in enumerate(unit_order):
         # Plot trajectory
@@ -413,6 +417,14 @@ def plot_surge_response(results: Dict[str, Any]):
         fig.add_trace(go.Scatter(x=times, y=[x0[i]] * len(times), mode='lines',
                 name=f'{unit} Baseline', line=dict(color='red', width=2, dash='dash'),
                 showlegend=True), row=i + 1, col=1)
+
+        # --- extra beds (right axis, starts at 0) ---
+        fig.add_trace(go.Scatter(x=times, y=x_ts[:, i]-x0[i], mode="lines",
+                                  line=dict(color=extra_colors.get(unit, '#666666'), width=2, dash="dot"),
+                                 visible="legendonly",
+                                 showlegend=False), row=i + 1, col=1, secondary_y=True)
+        fig.update_yaxes(title_text="Extra beds", secondary_y=True,
+                         row=i + 1, col=1, rangemode="tozero")
 
         # Shade surge periods
         if unit in surge_specs:
@@ -442,6 +454,106 @@ def plot_surge_response(results: Dict[str, Any]):
     st.plotly_chart(fig, use_container_width=True)
 
 
+import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import streamlit as st
+from typing import Dict, Any
+
+
+def plot_surge_response(results: Dict[str, Any]):
+
+    times = results['times']
+    x_ts = results['x_ts']
+    x0 = results['x0']
+    unit_order = results['unit_order']
+    surge_specs = results.get('surge_specs', {})
+
+    fig = make_subplots(
+        rows=len(unit_order),
+        cols=1,
+        subplot_titles=[f"{unit} Unit Response" for unit in unit_order],
+        vertical_spacing=0.1,
+        shared_xaxes=True
+    )
+
+    colors = {'WARD': '#4ecdc4', 'STEP': '#45b7d1', 'ICU': '#96ceb4'}
+
+    for i, unit in enumerate(unit_order):
+
+        baseline = np.full(len(times), x0[i])
+        extra = x_ts[:, i] - x0[i]
+
+        # --- Baseline
+        fig.add_trace(
+            go.Scatter(
+                x=times,
+                y=baseline,
+                mode='lines',
+                name=f'{unit} Baseline',
+                line=dict(color='red', dash='dash'),
+                showlegend=(i == 0),
+                hovertemplate="Baseline: %{y:.2f}<extra></extra>"
+            ),
+            row=i + 1, col=1
+        )
+
+        # --- Occupancy + shaded extra beds
+        fig.add_trace(
+            go.Scatter(
+                x=times,
+                y=x_ts[:, i],
+                mode='lines+markers',
+                name=f'{unit}',
+                line=dict(color=colors.get(unit, '#888888'), width=3),
+                fill='tonexty',
+                fillcolor='rgba(0, 0, 0, 0.)',
+                showlegend=(i == 0),
+                customdata=np.stack([baseline, extra], axis=-1),
+                hovertemplate=(
+                    "Day %{x}<br>"
+                    "Patients: %{y:.2f}<br>"
+                    "Extra Beds: %{customdata[1]:.2f}"
+                    "<extra></extra>"
+                )
+            ),
+            row=i + 1, col=1
+        )
+
+
+        # --- Surge shading
+        if unit in surge_specs:
+            for t_on, t_off, amp in surge_specs[unit]:
+                fig.add_vrect(
+                    x0=t_on, x1=t_off,
+                    fillcolor="rgba(255,0,0,0.1)",
+                    layer="below",
+                    line_width=0,
+                    row=i + 1, col=1
+                )
+
+        # --- Peak annotation
+        peak_idx = np.argmax(extra)
+        fig.add_annotation(
+            x=times[peak_idx],
+            y=x_ts[peak_idx, i],
+            text=f"Peak Extra: {extra[peak_idx]:.1f}",
+            showarrow=True,
+            arrowhead=2,
+            row=i + 1, col=1
+        )
+
+        fig.update_yaxes(title_text="Patients", row=i + 1, col=1)
+
+    fig.update_xaxes(title_text="Time (days)", row=len(unit_order), col=1)
+
+    fig.update_layout(
+        height=320 * len(unit_order),
+        title="Surge Response Analysis",
+        hovermode='x unified'  # 🔥 synchronized daily view
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def summary_metrics_surge_response(results: Dict[str, Any]):
