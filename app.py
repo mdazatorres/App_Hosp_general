@@ -3,7 +3,7 @@ from core.equation_builder import build_equations
 from core.data_manager import get_flows, get_selected_units, get_required_data
 from core.data_processor import process_input_data
 from utils.session_manager import initialize_session, update_current_params
-from ui.tabs import (render_model_summary_tab, render_parameters_tab, render_equilibrium_tab, render_dynamics_tab, render_sidebar_info)
+from ui.tabs import (render_model_summary_tab, render_equilibrium_tab, render_dynamics_tab, render_sidebar_info)
 from ui.surge_analysis_tab import render_surge_analysis_tab
 from ui.help_content import (QUICK_START_GUIDE, MODEL_INFO)
 import numpy as np
