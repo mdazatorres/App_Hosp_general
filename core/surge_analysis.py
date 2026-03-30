@@ -1,7 +1,5 @@
 #from data_params import *
-#import matplotlib.pyplot as plt
 from scipy.linalg import expm
-import numpy as np
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -10,7 +8,6 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots  # Add this line
 import plotly.express as px
 from typing import Dict, List, Tuple, Optional, Any
-
 
 
 
@@ -351,13 +348,13 @@ def transient_response_for_multi_surge(units: List[str], params: Dict, values: D
         x_ts[k] = x0 + z
     #------------------ solve this trapz instead trapezoid
     # Calculate extra bed-days
-    extra_beddays_total = np.trapezoid(np.sum(x_ts - x0, axis=1), times)
-    #extra_beddays_total = np.trapz(np.sum(x_ts - x0, axis=1), times)
+    #extra_beddays_total = np.trapezoid(np.sum(x_ts - x0, axis=1), times)
+    extra_beddays_total = np.trapz(np.sum(x_ts - x0, axis=1), times)
 
     extra_beddays_per_comp = {}
     for i, unit in enumerate(inpatient_units):
-        extra_beddays_per_comp[unit] = np.trapezoid(x_ts[:, i] - x0[i], times)
-        #extra_beddays_per_comp[unit] = np.trapz(x_ts[:, i] - x0[i], times)
+        #extra_beddays_per_comp[unit] = np.trapezoid(x_ts[:, i] - x0[i], times)
+        extra_beddays_per_comp[unit] = np.trapz(x_ts[:, i] - x0[i], times)
 
     # Pack results
     results = {
@@ -454,11 +451,7 @@ def plot_surge_response1(results: Dict[str, Any]):
     st.plotly_chart(fig, use_container_width=True)
 
 
-import numpy as np
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import streamlit as st
-from typing import Dict, Any
+
 
 
 def plot_surge_response(results: Dict[str, Any]):
