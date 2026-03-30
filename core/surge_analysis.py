@@ -348,13 +348,13 @@ def transient_response_for_multi_surge(units: List[str], params: Dict, values: D
         x_ts[k] = x0 + z
     #------------------ solve this trapz instead trapezoid
     # Calculate extra bed-days
-    #extra_beddays_total = np.trapezoid(np.sum(x_ts - x0, axis=1), times)
-    extra_beddays_total = np.trapz(np.sum(x_ts - x0, axis=1), times)
+    extra_beddays_total = np.trapezoid(np.sum(x_ts - x0, axis=1), times)
+    #extra_beddays_total = np.trapz(np.sum(x_ts - x0, axis=1), times)
 
     extra_beddays_per_comp = {}
     for i, unit in enumerate(inpatient_units):
-        #extra_beddays_per_comp[unit] = np.trapezoid(x_ts[:, i] - x0[i], times)
-        extra_beddays_per_comp[unit] = np.trapz(x_ts[:, i] - x0[i], times)
+        extra_beddays_per_comp[unit] = np.trapezoid(x_ts[:, i] - x0[i], times)
+        #extra_beddays_per_comp[unit] = np.trapz(x_ts[:, i] - x0[i], times)
 
     # Pack results
     results = {
