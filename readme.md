@@ -23,7 +23,8 @@ This application allows healthcare analysts and hospital administrators to
 
 
 hospital_model_app/
-```
+```     
+        │
         ├── app.py                                    # MAIN ENTRY POINT: Sets up page, initializes session, gets user inputs, creates tabs, calls render functions from ui/tabs.py
         ├── requirements.txt                          # Python dependencies
         ├── create_example_data_set.py                # Script to generate sample data
@@ -81,45 +82,46 @@ hospital_model_app/
                 │ • ODE equations   │    │                    │    │ • Summary metrics │
                 └───────────────────┘    └────────────────────┘    └───────────────────┘
 
-app.py
-  ├── core.data_manager
-  ├── core.data_processor
-  ├── utils.session_manager
-  ├── ui.tabs
-  ├── ui.help_content
-  └── ui.surge_analysis_tab
-
-core.data_manager
-  └── core.constants
-
-core.data_processor
-  ├── core.constants
-  └── core.parameters
-
-core.parameters
-  ├── core.constants
-  └── core.data_manager (for get_selected_units)
-
-core.equilibrium_solver
-  ├── core.equation_builder
-  └── core.constants
-
-core.surge_analysis
-  └── scipy, numpy, plotly
-
-ui.tabs
-  ├── core.equation_builder
-  ├── core.constants
-  ├── core.equilibrium_solver
-  ├── core.dynamics_simulator
-  └── ui.visualizations
-
-ui.surge_analysis_tab
-  └── core.surge_analysis
-
-ui.visualizations
-  └── plotly, pandas
-
+            
+            app.py
+              ├── core.data_manager
+              ├── core.data_processor
+              ├── utils.session_manager
+              ├── ui.tabs
+              ├── ui.help_content
+              └── ui.surge_analysis_tab
+            
+            core.data_manager
+              └── core.constants
+            
+            core.data_processor
+              ├── core.constants
+              └── core.parameters
+            
+            core.parameters
+              ├── core.constants
+              └── core.data_manager (for get_selected_units)
+            
+            core.equilibrium_solver
+              ├── core.equation_builder
+              └── core.constants
+            
+            core.surge_analysis
+              └── scipy, numpy, plotly
+            
+            ui.tabs
+              ├── core.equation_builder
+              ├── core.constants
+              ├── core.equilibrium_solver
+              ├── core.dynamics_simulator
+              └── ui.visualizations
+            
+            ui.surge_analysis_tab
+              └── core.surge_analysis
+            
+            ui.visualizations
+              └── plotly, pandas
+            
 
 What to Modify	                          Where to Look
 Add new input variables	                  core/constants.py (BASE_DATA, DATA_DICTIONARY, DEFAULT_VALUES)
