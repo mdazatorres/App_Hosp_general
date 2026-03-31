@@ -16,8 +16,6 @@ def plot_units_comparison(df: pd.DataFrame,equilibrium: Dict[str, float], select
         equilibrium: Dictionary with equilibrium values
         selected_units: List of selected units
     """
-
-
     # Map unit names to column names
     unit_to_column = { "WARD": "ward_occupied_beds", "STEP": "stepdown_occupied_beds", "ICU": "ICU_occupied_beds"}
 
@@ -127,8 +125,7 @@ def plot_utilization_metrics(
                 'Equilibrium': eq_value,
                 'Difference (%)': ((eq_value - historical_mean) / historical_mean * 100) if historical_mean > 0 else 0,
                 'Min': df[beds_col].min(),
-                'Max': df[beds_col].max()
-            })
+                'Max': df[beds_col].max() })
 
     if metrics:
         df_metrics = pd.DataFrame(metrics)
