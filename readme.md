@@ -124,14 +124,24 @@ hospital_model_app/
             
 
 What to Modify	                          Where to Look
+
 Add new input variables	                  core/constants.py (BASE_DATA, DATA_DICTIONARY, DEFAULT_VALUES)
+
 Change parameter calculation	          core/parameters.py (compute_parameters_from_entry, compute_parameters_from_excel)
+
 Modify equations	                      core/equations_builder.py (build_equations)
+
 Change equilibrium solver	              core/equilibrium_solver.py (solve_equilibrium)
+
 Add surge analysis features	              core/surge_analysis.py (transient_response_for_multi_surge, plot_surge_response)
+
 Modify UI layout	                      ui/tabs.py and ui/surge_analysis_tab.py
+
 Change documentation	                  ui/help_content.py
+
 Add new plots	                          ui/visualizations.py
+
 Change session state variables	          utils/session_manager.py
+
 Add new input mode	                      core/data_manager.py (get_operational_inputs) and core/data_processor.py
 
