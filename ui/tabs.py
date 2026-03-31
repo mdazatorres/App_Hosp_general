@@ -20,8 +20,23 @@ def render_model_summary_tab(selected_units: List[str], flows: List[tuple], requ
     with col2:
         st.subheader("Hospital Flow Structure")
         if flows:
-            for a, b in flows:
-                st.write(f"  • {a} → {b}")
+            # Split flows into two columns if more than 4
+            if len(flows) > 4:
+                # Split the flows list into two halves
+                mid = len(flows) // 2 + (len(flows) % 2)
+                flows_col1, flows_col2 = flows[:mid], flows[mid:]
+
+                # Create nested columns
+                flow_col1, flow_col2 = st.columns(2)
+                with flow_col1:
+                    for a, b in flows_col1:
+                        st.write(f"  • {a} → {b}")
+                with flow_col2:
+                    for a, b in flows_col2:
+                        st.write(f"  • {a} → {b}")
+            else:
+                for a, b in flows:
+                    st.write(f"  • {a} → {b}")
         else:
             st.write("No flows defined")
 
