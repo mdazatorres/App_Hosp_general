@@ -49,23 +49,29 @@ def render_model_summary_tab(selected_units: List[str], flows: List[tuple], requ
 def _render_data_dictionary(required_data: set):
     """Helper to render data dictionary"""
     st.subheader("Required Data Inputs")
+    st.caption("**Note**: For upload Excel option, create a file with the required columns below or download the template from the sidebar")
+    # Color legend
+    badge_colors = {'ED': '🔴', 'WARD': '🟢', 'STEP': '🔵', 'ICU': '🟣'}
+    unit_names = {'ED': 'ED', 'WARD': 'Ward', 'STEP': 'Step-down', 'ICU': 'ICU'}
+
+    legend = " | ".join([f"{badge_colors[u]} {unit_names[u]}" for u in ['ED', 'WARD', 'STEP', 'ICU']])
+
+
     if not required_data:
         st.write("No data inputs required")
         return
 
     data_list = sorted(required_data)
+
     # Quick reference
     cols = st.columns(3)
-    badge_colors = {'ED': '🔴', 'WARD': '🟢', 'STEP': '🔵', 'ICU': '🟣'}
-
     for i, data in enumerate(data_list):
         category = DATA_DICTIONARY.get(data, {}).get('category', 'Unknown')
         badge = badge_colors.get(category, '⚪')
         cols[i % 3].write(f"{badge} {data}")
-
+    st.caption(f"**Color code:** {legend}")
     with st.expander("📚 Click to see detailed variable descriptions", expanded=False):
         _render_data_dictionary_tabs(data_list)
-
 
 
 def _render_data_dictionary_tabs(data_list: List[str]):
