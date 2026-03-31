@@ -6,7 +6,7 @@ from core.constants import DEFAULT_VALUES
 from core.parameter_calculator import compute_parameters_from_entry, compute_parameters_from_excel
 
 
-def process_input_data(required_data: set, selected_units: list) -> Tuple[Dict, Dict]:
+def process_input_data(required_data: set, selected_units: list, mode: str) -> Tuple[Dict, Dict]:
     """
     Process input data based on mode (upload, manual, or default)
     Returns (values, params)
@@ -14,7 +14,7 @@ def process_input_data(required_data: set, selected_units: list) -> Tuple[Dict, 
     from core.data_manager import get_operational_inputs
 
     # Get operational inputs
-    values = get_operational_inputs(required_data)
+    values = get_operational_inputs(required_data, selected_units, mode)
 
     # Check if we have uploaded data
     if st.session_state.get('data_ready', False) and st.session_state.get('uploaded_df') is not None:
@@ -32,7 +32,6 @@ def process_input_data(required_data: set, selected_units: list) -> Tuple[Dict, 
 def _process_uploaded_data(df: pd.DataFrame, selected_units: list) -> Tuple[Dict, Dict]:
     """Process uploaded Excel data"""
     params = compute_parameters_from_excel(df, selected_units)
-    st.session_state['uploaded_df_for_plot'] = df  # 👈 THIS IS KEY
     st.success("✅ Parameters computed successfully from uploaded data!")
     values = DEFAULT_VALUES.copy()  # For display only
     return values, params

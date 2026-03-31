@@ -23,13 +23,17 @@ initialize_session()
 # GET USER CONFIGURATION
 # =====================================================
 selected_units = get_selected_units()
-required_data = get_required_data(selected_units)
+
+st.sidebar.header("Hospital operational data")
+mode = st.sidebar.radio("Provide values:", ["Manual entry", "Upload Excel (daily data)"])
+
+required_data = get_required_data(selected_units, mode)
 flows = get_flows(selected_units)
 
 # =====================================================
 # PROCESS INPUT DATA
 # =====================================================
-values, params = process_input_data(required_data, selected_units) # here I compute the parameters from excel or manual entry
+values, params = process_input_data(required_data, selected_units, mode) # here I compute the parameters from excel or manual entry
 update_current_params(params)
 
 # =====================================================

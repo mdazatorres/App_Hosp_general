@@ -1,13 +1,11 @@
 import streamlit as st
 import pandas as pd
-from core.constants import DEFAULT_VALUES, BASE_DATA
+from core.constants import DEFAULT_VALUES, BASE_DATA, BASE_DATA_MANUAL,DATA_DICTIONARY
 
 
 
-def get_operational_inputs(required_data):
-    st.sidebar.header("Hospital operational data")
+def get_operational_inputs(required_data,selected_units, mode):
 
-    mode = st.sidebar.radio("Provide values:", ["Manual entry", "Upload Excel (daily data)"])
     values = {}
 
     # Define default values dictionary
@@ -66,25 +64,121 @@ def get_operational_inputs(required_data):
     # MANUAL ENTRY WITH DEFAULTS
     # ===============================
     else:
-        st.sidebar.markdown("### Enter planning values")
+        # ===============================
+        # MANUAL ENTRY WITH DEFAULTS - ORGANIZED BY UNIT
+        # ===============================
 
-        # Create columns for better organization
-        col1, col2 = st.sidebar.columns(2)
+        st.sidebar.markdown("### Enter Hospital Metrics")
+        st.sidebar.markdown("---")
 
-        for i, v in enumerate(sorted(required_data)):
-            # Get default value from dictionary, or 0.0 if not found
-            default_val = DEFAULT_VALUES.get(v, 0.0)
+        # Import BASE_DATA_MANUAL to know which parameters belong to which unit
+        from core.constants import BASE_DATA_MANUAL
 
-            if i % 2 == 0:
-                with col1:
-                    values[v] = st.number_input(v.replace('_', ' ').title(),min_value=0.0,
-                        value=default_val, step=1.0, format="%.2f", key=f"input_{v}" )
-            else:
-                with col2:
-                    values[v] = st.number_input(v.replace('_', ' ').title(), min_value=0.0,
-                        value=default_val, step=1.0, format="%.2f", key=f"input_{v}")
+        # Define unit icons and names
+        units_in_order = ['ED', 'WARD', 'STEP', 'ICU']
+        unit_icons = {'ED': '🚨', 'WARD': '🛏️', 'STEP': '📉', 'ICU': '💉'}
+        unit_names = {
+            'ED': 'Emergency Department',
+            'WARD': 'General Ward',
+            'STEP': 'Step-down / PCU',
+            'ICU': 'Intensive Care Unit'}
+
+        # Define display names, units, and help text for each parameter
+
+        param_display = {}
+        for param, info in DATA_DICTIONARY.items():
+            param_display[param] = {
+                'name': info.get('name', ''),
+                'unit': info.get('unit', ''),
+                'help': info.get('description', f'Enter value for {param.replace("_", " ")}')}
+
+        # Create a mapping from parameter to unit based on BASE_DATA_MANUAL
+        param_to_unit = {}
+        for unit, params in BASE_DATA_MANUAL.items():
+            for param in params:
+                param_to_unit[param] = unit
+
+        # Add conditional transfers to ED unit
+        conditional_transfers = ['ED_to_ward_admissions', 'ED_to_stepdown_admissions', 'ED_to_ICU_admissions']
+        for param in conditional_transfers:
+            param_to_unit[param] = 'ED'
+
+        # Group required_data by unit
+        params_by_unit = {}
+        for var in sorted(required_data):
+            unit = param_to_unit.get(var, 'Other')
+            if unit not in params_by_unit:
+                params_by_unit[unit] = []
+            params_by_unit[unit].append(var)
+
+        # Display parameters organized by unit
+        for unit in units_in_order:
+            if unit in selected_units and unit in params_by_unit and params_by_unit[unit]:
+                # Unit header with icon
+                st.sidebar.markdown(f"### {unit_icons.get(unit, '📊')} {unit_names.get(unit, unit)}")
+
+                # Create two columns for this unit
+                col1, col2 = st.sidebar.columns(2)
+
+                for i, var in enumerate(params_by_unit[unit]):
+                    # Get display info - use param_display if available, otherwise create generic
+                    if var in param_display:
+                        info = param_display[var]
+                    else:
+                        # Generic fallback for any parameter not in param_display
+                        info = {
+                            'name': var.replace('_', ' ').title(),
+                            'unit': '',
+                            'help': f'Enter value for {var.replace("_", " ")}'
+                        }
+
+                    display_name = info['name']
+                    unit_label = info['unit']
+                    help_text = info['help']
+
+                    # Get default value
+                    default_val = DEFAULT_VALUES.get(var, 0.0)
+
+                    # Format label with unit
+                    if unit_label:
+                        label = f"{display_name} ({unit_label})"
+                    else:
+                        label = display_name
+
+                    # Alternate between columns
+                    if i % 2 == 0:
+                        with col1:
+                            values[var] = st.number_input(label, min_value=0.0, value=default_val,
+                                step=1.0, format="%.2f", key=f"manual_{var}", help=help_text)
+                    else:
+                        with col2:
+                            values[var] = st.number_input(label, min_value=0.0, value=default_val,
+                                step=1.0, format="%.2f", key=f"manual_{var}", help=help_text )
+
+                st.sidebar.markdown("---")  # Separator between units
+
         st.session_state['data_ready'] = True
         st.session_state['uploaded_df'] = None
+
+        # st.sidebar.markdown("### Enter planning values")
+        #
+        # # Create columns for better organization
+        # col1, col2 = st.sidebar.columns(2)
+        #
+        # for i, v in enumerate(sorted(required_data)):
+        #     # Get default value from dictionary, or 0.0 if not found
+        #     default_val = DEFAULT_VALUES.get(v, 0.0)
+        #
+        #     if i % 2 == 0:
+        #         with col1:
+        #             values[v] = st.number_input(v.replace('_', ' ').title(),min_value=0.0,
+        #                 value=default_val, step=1.0, format="%.2f", key=f"input_{v}" )
+        #     else:
+        #         with col2:
+        #             values[v] = st.number_input(v.replace('_', ' ').title(), min_value=0.0,
+        #                 value=default_val, step=1.0, format="%.2f", key=f"input_{v}")
+        # st.session_state['data_ready'] = True
+        # st.session_state['uploaded_df'] = None
     return values
 
 
@@ -115,11 +209,36 @@ def get_selected_units():
     return units
 
 
-def get_required_data(selected_units):
-    """Get all required data variables based on selected units"""
+# def get_required_data(selected_units):
+#     """Get all required data variables based on selected units"""
+#     required_data = set()
+#     for u in selected_units:
+#         required_data.update(BASE_DATA.get(u, []))
+#
+#     # Add conditional transfers
+#     transfers = [
+#         ("ED", "WARD", "ED_to_ward_admissions"),
+#         ("ED", "STEP", "ED_to_stepdown_admissions"),
+#         ("ED", "ICU", "ED_to_ICU_admissions")
+#     ]
+#
+#     for a, b, name in transfers:
+#         if a in selected_units and b in selected_units:
+#             required_data.add(name)
+#
+#     return required_data
+
+
+def get_required_data(selected_units, mode):
+    # Choose the correct base data dictionary based on mode
+    if mode == "Upload Excel (daily data)":
+        base_data = BASE_DATA
+    else:
+        base_data = BASE_DATA_MANUAL
+
     required_data = set()
     for u in selected_units:
-        required_data.update(BASE_DATA.get(u, []))
+        required_data.update(base_data.get(u, []))
 
     # Add conditional transfers
     transfers = [
@@ -133,4 +252,5 @@ def get_required_data(selected_units):
             required_data.add(name)
 
     return required_data
+
 
