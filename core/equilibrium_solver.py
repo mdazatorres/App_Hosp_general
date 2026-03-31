@@ -14,9 +14,6 @@ def solve_equilibrium(units, params, values):
     """
     Solve steady-state bed occupancy by linear flow balance.
     """
-
-    st.subheader("⚖️ Equilibrium Analysis")
-
     equilibrium = {}
 
     if not params or not values:
@@ -159,43 +156,6 @@ def solve_equilibrium(units, params, values):
         except np.linalg.LinAlgError:
             st.error("Equilibrium matrix is singular. Check transfer rates.")
             return {}
-
-    # =====================================================
-    # DISPLAY RESULTS
-    # =====================================================
-    if equilibrium:
-
-        eq_df = pd.DataFrame([
-            {"Compartment": k,
-             "Equilibrium Occupancy": f"{v:.1f} patients",
-             "Value": v}
-            for k, v in equilibrium.items()
-        ])
-
-        col1, col2 = st.columns([2, 1])
-
-        with col1:
-            st.dataframe(eq_df, use_container_width=True)
-
-        with col2:
-            fig = go.Figure()
-            fig.add_bar(
-                x=list(equilibrium.keys()),
-                y=list(equilibrium.values())
-            )
-            fig.update_layout(
-                title="Equilibrium Occupancy",
-                yaxis_title="Patients",
-                height=400
-            )
-            st.plotly_chart(fig, use_container_width=True)
-
-        total = sum(equilibrium.values())
-        st.metric("Total Patients in System", f"{total:.1f}")
-
-    else:
-        st.info("Not enough data to compute equilibrium.")
-
     return equilibrium
 
 

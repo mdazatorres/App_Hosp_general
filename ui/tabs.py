@@ -132,14 +132,16 @@ def render_equilibrium_tab(selected_units: List[str], params: Dict, values: Dict
             from core.equilibrium_solver import solve_equilibrium
             equilibrium = solve_equilibrium(selected_units, params, values)
 
-            # ADD THIS PART - Show plots if we have uploaded data
-            if equilibrium and st.session_state.get('uploaded_df_for_plot') is not None:
-                from ui.visualizations import (plot_units_comparison, plot_utilization_metrics)
+            # Check if we have uploaded data for plotting
+            has_uploaded_data = st.session_state.get('uploaded_df_for_plot') is not None
 
+            if equilibrium and has_uploaded_data:
+                from ui.visualizations import plot_units_comparison, plot_utilization_metrics,table_equilibrium
+                table_equilibrium(equilibrium)
                 df = st.session_state['uploaded_df_for_plot']
-
                 st.divider()
-                st.subheader("📊 Comparison with Historical Data")
+                st.subheader("📊 Historical Data vs Equilibrium")
+                #st.success(f"✅ Showing comparison with uploaded data ({len(df)} rows)")
 
                 # Create tabs for different visualizations
                 viz_tab1, viz_tab2 = st.tabs(["📈 Occupancy Trends", "📋 Summary Metrics"])
@@ -151,9 +153,16 @@ def render_equilibrium_tab(selected_units: List[str], params: Dict, values: Dict
                     plot_utilization_metrics(df, equilibrium, selected_units)
 
             elif equilibrium:
+                from ui.visualizations import table_equilibrium,plot_hist_equilibrium
+                table_equilibrium(equilibrium)
+                plot_hist_equilibrium(equilibrium)
+
                 st.info("ℹ️ Upload Excel data to see comparison with historical trends")
+            else:
+                st.warning("No equilibrium results to display")
         else:
             st.warning("Please provide input values first")
+
 
 
 def render_dynamics_tab(selected_units: List[str], params: Dict, values: Dict):

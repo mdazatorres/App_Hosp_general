@@ -32,6 +32,9 @@ def process_input_data(required_data: set, selected_units: list, mode: str) -> T
 def _process_uploaded_data(df: pd.DataFrame, selected_units: list) -> Tuple[Dict, Dict]:
     """Process uploaded Excel data"""
     params = compute_parameters_from_excel(df, selected_units)
+    # Store the dataframe in session state for later plotting
+    st.session_state['uploaded_df_for_plot'] = df  # 👈 THIS IS KEY
+    st.session_state['uploaded_data_source'] = 'excel'  # Track data source
     st.success("✅ Parameters computed successfully from uploaded data!")
     values = DEFAULT_VALUES.copy()  # For display only
     return values, params
@@ -41,6 +44,8 @@ def _process_manual_data(values: Dict, selected_units: list) -> Tuple[Dict, Dict
     """Process manually entered data"""
     params = compute_parameters_from_entry(values, selected_units)
     st.info("📝 Using manually entered values")
+    st.session_state['uploaded_df_for_plot'] = None
+    st.session_state['uploaded_data_source'] = 'manual'
     return values, params
 
 
@@ -51,4 +56,6 @@ def _process_default_data(selected_units: list) -> Tuple[Dict, Dict]:
     params = compute_parameters_from_entry(values, selected_units)
     st.session_state['data_ready'] = True
     st.session_state['uploaded_df'] = None
+    st.session_state['uploaded_df_for_plot'] = None
+    st.session_state['uploaded_data_source'] = 'default'
     return values, params

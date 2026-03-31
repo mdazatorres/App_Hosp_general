@@ -1,7 +1,7 @@
 """Help and documentation content"""
 
 QUICK_START_GUIDE = """
-### 🚀 Quick Start Guide
+### Quick Start Guide
 
 This guide will help you get started with the Hospital Compartment Model Builder in three simple steps.
 
