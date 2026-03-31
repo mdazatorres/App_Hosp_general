@@ -103,8 +103,7 @@ def _render_data_dictionary_tabs(data_list: List[str]):
                 st.dataframe(
                     pd.DataFrame(table_data),
                     use_container_width=True,
-                    hide_index=True,
-                    column_config={
+                    hide_index=True, column_config={
                         "Variable": st.column_config.TextColumn(width="medium"),
                         "Description": st.column_config.TextColumn(width="large"),
                         "Unit": st.column_config.TextColumn(width="small")})

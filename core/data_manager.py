@@ -41,8 +41,7 @@ def download_excel_template(required_data):
             data=output,
             file_name="hospital_data_template.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True
-        )
+            use_container_width=True)
 
         st.caption(f"Template includes {len(required_data)} required columns + Date column")
 
@@ -178,8 +177,7 @@ def get_operational_inputs(required_data,selected_units, mode):
                         info = {
                             'name': var.replace('_', ' ').title(),
                             'unit': '',
-                            'help': f'Enter value for {var.replace("_", " ")}'
-                        }
+                            'help': f'Enter value for {var.replace("_", " ")}' }
 
                     display_name = info['name']
                     unit_label = info['unit']
@@ -237,25 +235,6 @@ def get_selected_units():
 
     return units
 
-
-# def get_required_data(selected_units):
-#     """Get all required data variables based on selected units"""
-#     required_data = set()
-#     for u in selected_units:
-#         required_data.update(BASE_DATA.get(u, []))
-#
-#     # Add conditional transfers
-#     transfers = [
-#         ("ED", "WARD", "ED_to_ward_admissions"),
-#         ("ED", "STEP", "ED_to_stepdown_admissions"),
-#         ("ED", "ICU", "ED_to_ICU_admissions")
-#     ]
-#
-#     for a, b, name in transfers:
-#         if a in selected_units and b in selected_units:
-#             required_data.add(name)
-#
-#     return required_data
 
 
 def get_required_data(selected_units, mode):

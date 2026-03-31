@@ -554,16 +554,7 @@ def plot_surge_response(results: Dict[str, Any]):
 
     st.plotly_chart(fig, use_container_width=True)
 
-
-def summary_metrics_surge_response(results: Dict[str, Any]):
-    """
-    Plot surge response results using Plotly.
-
-    Parameters:
-    -----------
-    results : Dict
-        Results from transient_response_for_multi_surge
-    """
+def summary_metrics_surge_response(results: Dict[str, Any], available_beds: Dict[str, int], baseline_occupancy: Dict[str, float]):
     # --------------- Compute transient system response to multiple surge events ------
     times = results['times']
     x_ts = results['x_ts']  # Time series of state variables (beds by unit)
@@ -600,10 +591,21 @@ def summary_metrics_surge_response(results: Dict[str, Any]):
         peak_extra_beds_per_comp[unit] = float(np.max(extra_beds_over_time[:, i]))
 
 
+    # Calculate capacity deficit (how many extra beds needed beyond available)
+    capacity_deficit = {}
+    for unit in unit_order:
+        available = available_beds.get(unit, 0)
+        peak_extra = peak_extra_beds_per_comp[unit]
+        if peak_extra > available:
+            capacity_deficit[unit] = peak_extra - available
+        else:
+            capacity_deficit[unit] = 0
+
+
     # Display metrics
     col1, col2= st.columns(2)
     with col1:
-        st.write("### 🏥 Peak Additional Bed Requirements")
+        st.write("### Peak Additional Bed Requirements")
         st.metric("Total Extra Beds Needed", f"{peak_extra_beds_total:.1f}", delta=None)
         st.markdown("**By unit:**")
         for unit in unit_order:
@@ -617,7 +619,7 @@ def summary_metrics_surge_response(results: Dict[str, Any]):
     #     st.metric("Peak Excess Patients", f"{max_excess:.1f}")
 
     with col2:
-        st.write("### 📊 Cumulative Bed-Days (Total Workload)")
+        st.write("### Cumulative Bed-Days (Total Workload)")
 
         # st.metric("Total Extra Bed-Days", f"{results['extra_beddays_total']:.1f}")
         # st.markdown("**By unit:**")
@@ -633,6 +635,26 @@ def summary_metrics_surge_response(results: Dict[str, Any]):
         st.markdown("**By unit:**")
         for unit, beddays in extra_beddays_per_comp_cut.items():
             st.write(f"- {unit}: {beddays:.1f} bed-days")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### 🛏️ Additional Beds Needed")
+
+        has_deficit = any(v > 0 for v in capacity_deficit.values())
+
+        if has_deficit:
+            st.caption("Based on your available capacity:")
+            for unit, deficit in capacity_deficit.items():
+                if deficit > 0:
+                    st.warning(f"**{unit}**: +{deficit:.0f} beds needed")
+            st.metric("Total Additional Beds", f"{sum(capacity_deficit.values()):.0f}", delta=None)
+        else:
+            st.success("✅ Current capacity sufficient")
+            st.caption("No additional beds needed for this surge")
+
+
+
 
     # Time to return to baseline (within 5%)
     # threshold = 0.05 * np.sum(x0)
