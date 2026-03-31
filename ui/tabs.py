@@ -109,6 +109,9 @@ def _render_data_dictionary_tabs(data_list: List[str]):
 def _render_ode_system(units: List[str]):
     """Render ODE equations"""
     st.subheader("ODE System")
+    st.write("The following ordinary differential equations (ODEs) describe patient flow through "
+             "the selected interconnected clinical units. For a detailed explanation of each equation"
+             " and model configuration, please refer to the **Documentation** tab.")
     equations = build_equations(units)
     for eq in equations:
         st.latex(eq)
