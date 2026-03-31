@@ -175,6 +175,7 @@ def render_dynamics_tab(selected_units: List[str], params: Dict, values: Dict):
         - ICU boarding: 10 patients
     """)
 
+# chek if this function is necessary
 
 def render_sidebar_info(selected_units: List[str], params: Dict, values: Dict):
     """Render sidebar information"""

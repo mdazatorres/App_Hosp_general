@@ -159,26 +159,6 @@ def get_operational_inputs(required_data,selected_units, mode):
 
         st.session_state['data_ready'] = True
         st.session_state['uploaded_df'] = None
-
-        # st.sidebar.markdown("### Enter planning values")
-        #
-        # # Create columns for better organization
-        # col1, col2 = st.sidebar.columns(2)
-        #
-        # for i, v in enumerate(sorted(required_data)):
-        #     # Get default value from dictionary, or 0.0 if not found
-        #     default_val = DEFAULT_VALUES.get(v, 0.0)
-        #
-        #     if i % 2 == 0:
-        #         with col1:
-        #             values[v] = st.number_input(v.replace('_', ' ').title(),min_value=0.0,
-        #                 value=default_val, step=1.0, format="%.2f", key=f"input_{v}" )
-        #     else:
-        #         with col2:
-        #             values[v] = st.number_input(v.replace('_', ' ').title(), min_value=0.0,
-        #                 value=default_val, step=1.0, format="%.2f", key=f"input_{v}")
-        # st.session_state['data_ready'] = True
-        # st.session_state['uploaded_df'] = None
     return values
 
 
