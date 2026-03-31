@@ -54,12 +54,7 @@ def _render_data_dictionary(required_data: set):
         return
 
     data_list = sorted(required_data)
-
-    with st.expander("📚 Click to see detailed explanations", expanded=False):
-        _render_data_dictionary_tabs(data_list)
-
     # Quick reference
-    st.markdown("**Current required data inputs:**")
     cols = st.columns(3)
     badge_colors = {'ED': '🔴', 'WARD': '🟢', 'STEP': '🔵', 'ICU': '🟣'}
 
@@ -67,6 +62,9 @@ def _render_data_dictionary(required_data: set):
         category = DATA_DICTIONARY.get(data, {}).get('category', 'Unknown')
         badge = badge_colors.get(category, '⚪')
         cols[i % 3].write(f"{badge} {data}")
+
+    with st.expander("📚 Click to see detailed variable descriptions", expanded=False):
+        _render_data_dictionary_tabs(data_list)
 
 
 
@@ -91,7 +89,7 @@ def _render_data_dictionary_tabs(data_list: List[str]):
                          and DATA_DICTIONARY[v]['category'] == category]
 
             if unit_vars:
-                table_data = [{'Variable': var.replace('_', ' ').title(),
+                table_data = [{'Variable': DATA_DICTIONARY[var]['name'],
                     'Description': DATA_DICTIONARY[var]['description'],
                     'Unit': DATA_DICTIONARY[var]['unit']
                 } for var in sorted(unit_vars)]
@@ -99,6 +97,7 @@ def _render_data_dictionary_tabs(data_list: List[str]):
                 st.dataframe(
                     pd.DataFrame(table_data),
                     use_container_width=True,
+                    hide_index=True,
                     column_config={
                         "Variable": st.column_config.TextColumn(width="medium"),
                         "Description": st.column_config.TextColumn(width="large"),
