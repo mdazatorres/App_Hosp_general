@@ -92,7 +92,7 @@ DATA_DICTIONARY = {
     },
     'ward_discharges': {
         'name': 'Ward Discharges',
-        'description': 'Average number of patients discharged from General Ward per day',
+        'description': 'Average number of patients discharged (including deaths) from the General Ward per day',
         'unit': 'patients/day',
         'category': 'WARD'
     },
@@ -104,7 +104,7 @@ DATA_DICTIONARY = {
     },
     'ward_transfer_admission': {
         'name': 'Ward Transfer Admission',
-        'description': 'Average number of patients transferred into General Ward from other units per day',
+        'description': 'Average number of inter-facility transfer admissions to the ICU unit per day',
         'unit': 'patients/day',
         'category': 'WARD'
     },
@@ -124,7 +124,7 @@ DATA_DICTIONARY = {
     },
     'stepdown_discharges': {
         'name': 'StepDown Discharges',
-        'description': 'Average number of patients discharged from Step-down unit per day',
+        'description': 'Average number of patients discharged (including deaths) from Step-down per day',
         'unit': 'patients/day',
         'category': 'STEP'
     },
@@ -136,7 +136,7 @@ DATA_DICTIONARY = {
     },
     'stepdown_transfer_admission': {
         'name': 'StepDown Transfer Admission',
-        'description': 'Average number of patients transferred into Step-down unit from other units per day',
+        'description': 'Average number of inter-facility transfer admissions to the StepDown unit per day',
         'unit': 'patients/day',
         'category': 'STEP'
     },
@@ -162,7 +162,7 @@ DATA_DICTIONARY = {
     },
     'ICU_discharges': {
         'name': 'ICU Discharges',
-        'description': 'Average number of patients discharged from ICU per day',
+        'description': 'Average number of patients discharged (including deaths) from ICU per day',
         'unit': 'patients/day',
         'category': 'ICU'
     },
@@ -174,7 +174,7 @@ DATA_DICTIONARY = {
     },
     'ICU_transfer_admission': {
         'name': 'ICU Transfer Admission',
-        'description': 'Average number of patients transferred into ICU from other units per day',
+        'description': 'Average number of inter-facility transfer admissions to the ICU unit per day',
         'unit': 'patients/day',
         'category': 'ICU'
     },
