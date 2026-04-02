@@ -52,7 +52,7 @@ Navigate through the tabs to explore your model:
 
 | Tab | Purpose |
 |-----|---------|
-| **📋 Model Summary** | Review your selected units, patient flow pathways, required data inputs, and the complete ODE system for your model |
+| **📋 Model Summary** | Review your selected units, patient flow pathways, required data inputs, and the complete differential equations system for your model |
 | **⚖️ Equilibrium** | Calculate steady-state occupancy levels. This shows where the system would stabilize under constant conditions—useful for validating against historical averages |
 | **📑 Scenario Analysis** | Test the impact of surge events. Define when and how much patient inflow increases in specific units, and see how this affects bed demand across the hospital |
 | **📚 Documentation** | Access the Quick Start guide (this page) and Model Theory documentation |

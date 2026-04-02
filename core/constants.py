@@ -29,7 +29,7 @@ BASE_DATA_MANUAL = {
 DATA_DICTIONARY = {
     # ED variables
     'daily_ED_arrivals': {
-        'name': 'Avg ED Arrivals',
+        'name': 'ED Arrivals',
         'description': 'Average number of patients arriving to the Emergency Department per day',
         'unit': 'patients/day',
         'category': 'ED'
@@ -41,25 +41,25 @@ DATA_DICTIONARY = {
         'category': 'ED'
     },
     'avg_ED_wait_time': {
-        'name': 'Avg ED Wait Time',
+        'name': 'ED Wait Time',
         'description': 'Average time patients wait before receiving initial treatment',
         'unit': 'minutes',
         'category': 'ED'
     },
     'avg_ED_boarding_time': {
-        'name': 'Avg ED Boarding Time',
+        'name': 'ED Boarding Time',
         'description': 'Average time admitted patients wait for an inpatient bed',
         'unit': 'minutes',
         'category': 'ED'
     },
     'avg_ED_treatment_time': {
-        'name': 'Avg ED Treatment Time',
+        'name': 'ED Treatment Time',
         'description': 'Average treatment time in the ED',
         'unit': 'minutes',
         'category': 'ED'
     },
     'total_adm_from_ED': {
-        'name': 'Avg Admissions to ICU',
+        'name': 'ED Admissions',
         'description': 'Average number of patients admitted to the hospital from ED per day',
         'unit': 'patients/day',
         'category': 'ED'
@@ -85,31 +85,31 @@ DATA_DICTIONARY = {
 
     # WARD variables
     'ward_occupied_beds': {
-        'name': 'Avg Ward Occupied Beds',
+        'name': 'Ward Occupied Beds',
         'description': 'Average daily number of occupied beds in the General Ward',
         'unit': 'beds',
         'category': 'WARD'
     },
     'ward_discharges': {
-        'name': 'Avg Ward Discharges',
+        'name': 'Ward Discharges',
         'description': 'Average number of patients discharged from General Ward per day',
         'unit': 'patients/day',
         'category': 'WARD'
     },
     'ward_direct_admission': {
-        'name': 'Avg Ward Direct Admission',
+        'name': 'Ward Direct Admission',
         'description': 'Average number of patients directly admitted to General Ward (non-ED) per day',
         'unit': 'patients/day',
         'category': 'WARD'
     },
     'ward_transfer_admission': {
-        'name': 'Avg Ward Transfer Admission',
+        'name': 'Ward Transfer Admission',
         'description': 'Average number of patients transferred into General Ward from other units per day',
         'unit': 'patients/day',
         'category': 'WARD'
     },
     'ward_to_ICU': {
-        'name': 'Avg Ward to ICU Transfers',
+        'name': 'Ward to ICU Transfers',
         'description': 'Average number of patients transferred from General Ward to ICU per day',
         'unit': 'patients/day',
         'category': 'WARD'
@@ -117,37 +117,37 @@ DATA_DICTIONARY = {
 
     # STEP-DOWN variables
     'stepdown_occupied_beds': {
-        'name': 'Avg StepDown Occupied Beds',
+        'name': 'StepDown Occupied Beds',
         'description': 'Average daily number of occupied beds in the Step-down unit',
         'unit': 'beds',
         'category': 'STEP'
     },
     'stepdown_discharges': {
-        'name': 'Avg StepDown Discharges',
+        'name': 'StepDown Discharges',
         'description': 'Average number of patients discharged from Step-down unit per day',
         'unit': 'patients/day',
         'category': 'STEP'
     },
     'stepdown_direct_admission': {
-        'name': 'Avg StepDown Direct Admission',
+        'name': 'StepDown Direct Admission',
         'description': 'Average number of patients directly admitted to Step-down unit (non-ED) per day',
         'unit': 'patients/day',
         'category': 'STEP'
     },
     'stepdown_transfer_admission': {
-        'name': 'Avg StepDown Transfer Admission',
+        'name': 'StepDown Transfer Admission',
         'description': 'Average number of patients transferred into Step-down unit from other units per day',
         'unit': 'patients/day',
         'category': 'STEP'
     },
     'stepdown_to_ICU': {
-        'name': 'Avg StepDown to ICU Transfers',
+        'name': 'StepDown to ICU Transfers',
         'description': 'Average number of patients transferred from Step-down to ICU per day',
         'unit': 'patients/day',
         'category': 'STEP'
     },
     'stepdown_to_ward': {
-        'name': 'Avg StepDown to Ward Transfers',
+        'name': 'StepDown to Ward Transfers',
         'description': 'Average number of patients transferred from Step-down to General Ward per day',
         'unit': 'patients/day',
         'category': 'STEP'
@@ -155,37 +155,37 @@ DATA_DICTIONARY = {
 
     # ICU variables
     'ICU_occupied_beds': {
-        'name': 'Avg ICU Occupied Beds',
+        'name': 'ICU Occupied Beds',
         'description': 'Average daily number of occupied beds in the ICU',
         'unit': 'beds',
         'category': 'ICU'
     },
     'ICU_discharges': {
-        'name': 'Avg ICU Discharges',
+        'name': 'ICU Discharges',
         'description': 'Average number of patients discharged from ICU per day',
         'unit': 'patients/day',
         'category': 'ICU'
     },
     'ICU_direct_admission': {
-        'name': 'Avg ICU Direct Admission',
+        'name': 'ICU Direct Admission',
         'description': 'Average number of patients directly admitted to ICU (non-ED) per day',
         'unit': 'patients/day',
         'category': 'ICU'
     },
     'ICU_transfer_admission': {
-        'name': 'Avg ICU Transfer Admission',
+        'name': 'ICU Transfer Admission',
         'description': 'Average number of patients transferred into ICU from other units per day',
         'unit': 'patients/day',
         'category': 'ICU'
     },
     'ICU_to_stepdown': {
-        'name': 'Avg ICU to Stepdown Transfers',
+        'name': 'ICU to Stepdown Transfers',
         'description': 'Average number of patients transferred from ICU to Step-down per day',
         'unit': 'patients/day',
         'category': 'ICU'
     },
     'ICU_to_ward': {
-        'name': 'Avg ICU to Ward Transfers',
+        'name': 'ICU to Ward Transfers',
         'description': 'Average number of patients transferred from ICU to General Ward per day',
         'unit': 'patients/day',
         'category': 'ICU'
