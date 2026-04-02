@@ -39,35 +39,36 @@ update_current_params(params)
 # =====================================================
 # CREATE TABS
 # =====================================================
-tab1, tab2, tab3,   tab4 = st.tabs([
-    "📋 Model Summary","⚖️ Equilibrium", "📑 Scenario Analysis", "📚 Documentation"])
+tab1, tab2, tab3,   tab4 = st.tabs(["📚 Documentation","📋 Model Summary","⚖️ Equilibrium", "📑 Scenario Analysis"])
 
 with tab1:
+    #st.header("Documentation")
+
+    help_tabs = st.tabs(["Quick Start", "Model Documentation"])
+
+    with help_tabs[0]:
+        st.markdown(QUICK_START_GUIDE)
+    with help_tabs[1]:
+        st.markdown(MODEL_INFO, unsafe_allow_html=True)
+
+with tab2:
     render_model_summary_tab(selected_units, flows, required_data)
 
 #with tab2:
 #    render_parameters_tab(params, values)
 # This just for test any mistake
 
-with tab2:
+with tab3:
     render_equilibrium_tab(selected_units, params, values)
 
 # with tab4:
 #     render_dynamics_tab(selected_units, params, values)
 
-with tab3:
+with tab4:
     render_surge_analysis_tab(selected_units, params, values)
 
 
-with tab4:
-    st.header("Documentation")
 
-    help_tabs = st.tabs(["🚀 Quick Start", "📚 Model Documentation"])
-
-    with help_tabs[0]:
-        st.markdown(QUICK_START_GUIDE)
-    with help_tabs[1]:
-        st.markdown(MODEL_INFO, unsafe_allow_html=True)
     # with help_tabs[2]:
     #     st.markdown(EQUATIONS_BY_MODEL)
     #     # Add your current equations
