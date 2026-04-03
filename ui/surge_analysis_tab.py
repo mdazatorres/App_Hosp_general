@@ -56,7 +56,7 @@ def capacity_gap_assessment(unit_order, peak_extra_beds_per_comp, peak_extra_bed
     has_deficit = any(v > 0 for v in capacity_deficit.values())
 
     if has_deficit:
-        col1, col2 = st.columns([1, 1])
+        col1, col2 = st.columns([2, 1])
 
         with col1:
             st.warning("⚠️ **Capacity Gaps Identified**")

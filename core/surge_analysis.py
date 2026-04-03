@@ -391,8 +391,7 @@ def plot_surge_response(results: Dict[str, Any]):
         cols=1,
         subplot_titles=[f"{unit} Unit Response" for unit in unit_order],
         vertical_spacing=0.1,
-        shared_xaxes=True
-    )
+        shared_xaxes=True)
 
     colors = {'WARD': '#4ecdc4', 'STEP': '#45b7d1', 'ICU': '#96ceb4'}
 
@@ -622,29 +621,6 @@ def summary_metrics_surge_response(results, surge_metrics):
 
     st.markdown("---")
 
-    # Optional: Add summary card
-
-
-
-
-
-
-
-
-    # Time to return to baseline (within 5%)
-    # threshold = 0.05 * np.sum(x0)
-    # close_enough = np.where(np.sum(np.abs(x_ts - x0), axis=1) < threshold)[0]
-    # if len(close_enough) > 0:
-    #     recovery_time = times[close_enough[0]]
-    # else:
-    #     recovery_time = times[-1]
-    # st.metric("Recovery Time (days)", f"{recovery_time:.1f}")
-    #
-    # # Extra bed-days per unit
-
-    # all the information here is correct I need to organize it
-
-
 # =============================================================================
 # EXAMPLE TEST MODULE
 # =============================================================================
@@ -732,34 +708,6 @@ def run_example_test():
     print(f"  Extra bed-days by unit:")
     for unit, val in results['extra_beddays_per_comp'].items():
         print(f"    {unit}: {val:.2f}")
-
-    # Create simple matplotlib plot for validation
-    #try:
-        #uncomente this to see the plot
-        # import matplotlib.pyplot as plt
-        #
-        # fig, axes = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
-        #
-        # for i, unit in enumerate(results['unit_order']):
-        #     axes[i].plot(results['times'], results['x_ts'][:, i], 'b-', linewidth=2, label='Response')
-        #     axes[i].axhline(y=results['x0'][i], color='r', linestyle='--', label='Baseline')
-        #     axes[i].set_ylabel(f'{unit} (patients)')
-        #     axes[i].legend()
-        #     axes[i].grid(alpha=0.3)
-        #
-        #     # Shade surge periods
-        #     if unit in surge_specs:
-        #         for t_on, t_off, amp in surge_specs[unit]:
-        #             axes[i].axvspan(t_on, t_off, alpha=0.2, color='red')
-
-        # axes[-1].set_xlabel('Time (days)')
-        # plt.suptitle('Surge Response Test')
-        # plt.tight_layout()
-        # plt.show()
-
-    # except ImportError:
-    #     print("\nMatplotlib not available for plotting")
-
     print("\n" + "=" * 60)
     print("TEST COMPLETE - Module ready for integration")
     print("=" * 60)
