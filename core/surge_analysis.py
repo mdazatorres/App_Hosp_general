@@ -376,88 +376,6 @@ def transient_response_for_multi_surge(units: List[str], params: Dict, values: D
     return results
 
 
-def plot_surge_response1(results: Dict[str, Any]):
-    """
-    Plot surge response results using Plotly.
-
-    Parameters:
-    -----------
-    results : Dict
-        Results from transient_response_for_multi_surge
-    """
-    times = results['times']
-    x_ts = results['x_ts']
-    x0 = results['x0']
-    unit_order = results['unit_order']
-    surge_specs = results.get('surge_specs', {})
-
-    # Calculate peak demands
-    extra_beds_over_time = x_ts - x0
-    peak_extra_beds_per_comp = {}
-    for i, unit in enumerate(unit_order):
-        peak_extra_beds_per_comp[unit] = float(np.max(extra_beds_over_time[:, i]))
-
-    # Create subplots
-    fig = make_subplots(
-        rows=len(unit_order),
-        cols=1,
-        subplot_titles=[f"{unit} Unit Response" for unit in unit_order],
-        vertical_spacing=0.1,
-        shared_xaxes=True,
-        specs=[[{"secondary_y": True}] for _ in range(len(unit_order))]  # Add secondary y-axis for each row
-    )
-
-    colors = {'WARD': '#4ecdc4', 'STEP': '#45b7d1', 'ICU': '#96ceb4'}
-    extra_colors = {'WARD': '#2c8c7a', 'STEP': '#2a6f8a', 'ICU': '#5a8a6e'}  # Darker shade
-
-    for i, unit in enumerate(unit_order):
-        # Plot trajectory
-        fig.add_trace(go.Scatter(x=times, y=x_ts[:, i], mode='lines',
-                name=f'{unit}', line=dict(color=colors.get(unit, '#888888'), width=3),
-                showlegend=True), row=i + 1, col=1)
-
-        # Plot baseline
-        fig.add_trace(go.Scatter(x=times, y=[x0[i]] * len(times), mode='lines',
-                name=f'{unit} Baseline', line=dict(color='red', width=2, dash='dash'),
-                showlegend=True), row=i + 1, col=1)
-
-        # --- extra beds (right axis, starts at 0) ---
-        fig.add_trace(go.Scatter(x=times, y=x_ts[:, i]-x0[i], mode="lines",
-                                  line=dict(color=extra_colors.get(unit, '#666666'), width=2, dash="dot"),
-                                 visible="legendonly",
-                                 showlegend=False), row=i + 1, col=1, secondary_y=True)
-        fig.update_yaxes(title_text="Extra beds", secondary_y=True,
-                         row=i + 1, col=1, rangemode="tozero")
-
-        # Shade surge periods
-        if unit in surge_specs:
-            for t_on, t_off, amp in surge_specs[unit]:
-                fig.add_vrect(x0=t_on, x1=t_off, fillcolor="rgba(255, 0, 0, 0.1)",
-                    layer="below", line_width=0, row=i + 1, col=1)
-
-                # Add peak annotation
-        peak_idx = np.argmax(extra_beds_over_time[:, i])
-        peak_time = times[peak_idx]
-        peak_value = x_ts[peak_idx, i]
-
-        fig.add_annotation(x=peak_time, y=peak_value,
-            text=f"Peak: {peak_value:.1f}", showarrow=True,
-            arrowhead=2, arrowcolor=colors.get(unit, '#888888'),
-            arrowsize=1, arrowwidth=2,ax=20,ay=-30,
-            row=i + 1, col=1)
-        fig.update_yaxes(title_text="Patients", row=i + 1, col=1)
-
-    fig.update_xaxes(title_text="Time (days)", row=len(unit_order), col=1)
-
-    fig.update_layout(height=300 * len(unit_order),
-        title_text="Surge Response Analysis",
-        hovermode='x unified',
-        showlegend=True)
-
-    st.plotly_chart(fig, use_container_width=True)
-
-
-
 
 
 def plot_surge_response(results: Dict[str, Any]):
@@ -554,7 +472,8 @@ def plot_surge_response(results: Dict[str, Any]):
 
     st.plotly_chart(fig, use_container_width=True)
 
-def summary_metrics_surge_response(results: Dict[str, Any], available_beds: Dict[str, int], baseline_occupancy: Dict[str, float]):
+
+def metrics_surge_response(results: Dict[str, Any]):
     # --------------- Compute transient system response to multiple surge events ------
     times = results['times']
     x_ts = results['x_ts']  # Time series of state variables (beds by unit)
@@ -590,68 +509,124 @@ def summary_metrics_surge_response(results: Dict[str, Any], available_beds: Dict
     for i, unit in enumerate(unit_order):
         peak_extra_beds_per_comp[unit] = float(np.max(extra_beds_over_time[:, i]))
 
+    # Calculate surge duration
+    surge_duration_days = len(times_plot) if len(times_plot) > 0 else 0
 
-    # Calculate capacity deficit (how many extra beds needed beyond available)
-    capacity_deficit = {}
-    for unit in unit_order:
-        available = available_beds.get(unit, 0)
-        peak_extra = peak_extra_beds_per_comp[unit]
-        if peak_extra > available:
-            capacity_deficit[unit] = peak_extra - available
-        else:
-            capacity_deficit[unit] = 0
+    # Calculate total workload
+    extra_beds_over_time_cut = extra_beds_over_time[:t_cut]
+    extra_beddays_per_comp_cut = {comp: extra_beds_over_time_cut[:, j].sum() for j, comp in enumerate(unit_order)}
+    extra_beddays_total_cut = sum(extra_beddays_per_comp_cut.values())
+
+    return {
+        'peak_extra_beds_total': peak_extra_beds_total,
+        'peak_extra_beds_per_comp': peak_extra_beds_per_comp,
+        'surge_duration_days': surge_duration_days,
+        'extra_beddays_total_cut': extra_beddays_total_cut,
+        'extra_beddays_per_comp_cut': extra_beddays_per_comp_cut
+    }
 
 
-    # Display metrics
-    col1, col2= st.columns(2)
+
+
+
+def summary_metrics_surge_response(results, surge_metrics):
+    x0 = results['x0']      # Baseline equilibrium (no-surge steady state)
+    unit_order = results['unit_order']
+    peak_extra_beds_total= surge_metrics['peak_extra_beds_total']
+    peak_extra_beds_per_comp=surge_metrics['peak_extra_beds_per_comp']
+    surge_duration_days=surge_metrics['surge_duration_days']
+    extra_beddays_total_cut=surge_metrics['extra_beddays_total_cut']
+    extra_beddays_per_comp_cut=surge_metrics['extra_beddays_per_comp_cut']
+
+
+    #st.markdown("---")
+    #st.subheader("Surge Impact Assessment")
+    st.caption(f"Analysis based on equilibrium baseline | Surge duration: {surge_duration_days} days")
+
+    # Row 1: Peak Demand Metrics
+    col1, col2, col3 = st.columns(3)
+
     with col1:
-        st.write("### Peak Additional Bed Requirements")
-        st.metric("Total Extra Beds Needed", f"{peak_extra_beds_total:.1f}", delta=None)
-        st.markdown("**By unit:**")
-        for unit in unit_order:
-            peak = peak_extra_beds_per_comp[unit]
-            baseline = x0[unit_order.index(unit)]
-            pct_increase = (peak / baseline * 100) if baseline > 0 else 0
-            st.markdown(f"- **{unit}**: {peak:.1f} extra "f"({pct_increase:.0f}% above baseline)")
-
-    # with col2:
-    #     max_excess = np.max(np.sum(x_ts - x0, axis=1))
-    #     st.metric("Peak Excess Patients", f"{max_excess:.1f}")
+        st.metric(label="🏥 Peak Total Bed Demand",
+            value=f"{peak_extra_beds_total:.1f}",
+            delta=f"extra beds above baseline",
+            help="Maximum additional beds needed at peak surge across all units combined")
 
     with col2:
-        st.write("### Cumulative Bed-Days (Total Workload)")
+        st.metric( label="⏱️ Surge Duration",
+            value=f"{surge_duration_days} days",
+            help="Total duration from surge onset until return to baseline")
 
-        # st.metric("Total Extra Bed-Days", f"{results['extra_beddays_total']:.1f}")
-        # st.markdown("**By unit:**")
-        # for unit in unit_order:
-        #     st.write(f"- {unit}: {results['extra_beddays_per_comp'][unit]:.1f}")
+    with col3:
+        st.metric(label="📈 Total Workload",
+            value=f"{extra_beddays_total_cut:.1f}",
+            delta="bed-days",
+            help="Cumulative excess bed-days during surge period (total workload above baseline)")
 
-
-        extra_beds_over_time_cut = extra_beds_over_time[:t_cut]
-        extra_beddays_per_comp_cut = {comp: extra_beds_over_time_cut[:, j].sum() for j, comp in enumerate(unit_order)}
-        extra_beddays_total_cut = sum(extra_beddays_per_comp_cut.values()) # Total system-wide bed-days
-
-        st.metric("Extra Bed-Days (Total)", f"{extra_beddays_total_cut:.1f}")
-        st.markdown("**By unit:**")
-        for unit, beddays in extra_beddays_per_comp_cut.items():
-            st.write(f"- {unit}: {beddays:.1f} bed-days")
+    #st.markdown("---")
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.markdown("### 🛏️ Additional Beds Needed")
+        st.markdown("#### Peak Additional Beds by Unit")
+        st.caption("Maximum beds needed above baseline during surge")
 
-        has_deficit = any(v > 0 for v in capacity_deficit.values())
+        # Create DataFrame for better display
+        peak_data = []
+        for unit in unit_order:
+            peak = peak_extra_beds_per_comp[unit]
+            baseline = x0[unit_order.index(unit)]
+            pct_increase = (peak / baseline * 100) if baseline > 0 else 0
 
-        if has_deficit:
-            st.caption("Based on your available capacity:")
-            for unit, deficit in capacity_deficit.items():
-                if deficit > 0:
-                    st.warning(f"**{unit}**: +{deficit:.0f} beds needed")
-            st.metric("Total Additional Beds", f"{sum(capacity_deficit.values()):.0f}", delta=None)
-        else:
-            st.success("✅ Current capacity sufficient")
-            st.caption("No additional beds needed for this surge")
+            peak_data.append({
+                "Unit": unit,
+                "Baseline": f"{baseline:.0f}",
+                "Extra Beds": f"{peak:.1f}",
+                "% Increase": f"{pct_increase:.0f}%"
+            })
+
+        st.dataframe(
+            pd.DataFrame(peak_data),
+            column_config={
+                "Unit": "Clinical Unit",
+                "Baseline": st.column_config.TextColumn("Baseline Occupancy", width="small"),
+                "Extra Beds": st.column_config.TextColumn("Extra Beds", width="small"),
+                "% Increase": st.column_config.TextColumn("Increase", width="small")
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+
+    with col2:
+        st.markdown("#### Cumulative Workload by Unit")
+        st.caption("Total excess bed-days accumulated during surge")
+
+        workload_data = []
+        for unit, beddays in extra_beddays_per_comp_cut.items():
+            workload_data.append({
+                "Unit": unit,
+                "Extra Bed-Days": f"{beddays:.1f}",
+                "Equivalent Days": f"{(beddays / max(1, peak_extra_beds_per_comp[unit])):.1f} days at peak"
+            })
+
+        st.dataframe(
+            pd.DataFrame(workload_data),
+            column_config={
+                "Unit": "Clinical Unit",
+                "Extra Bed-Days": st.column_config.TextColumn("Extra Bed-Days", width="medium"),
+                "Equivalent Days": st.column_config.TextColumn("Duration Equivalent", width="medium")
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+
+    st.markdown("---")
+
+    # Optional: Add summary card
+
+
+
+
 
 
 
