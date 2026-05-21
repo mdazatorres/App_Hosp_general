@@ -45,8 +45,8 @@ def build_equations(units):
         if "ICU" in units:
             outflow.append(r"\rho_{ward\to ICU}WARD")
 
-        # if "STEP" in units:
-        #     outflow.append(r"\rho_{ward\to step}WARD")
+        if "STEP" in units:
+            outflow.append(r"\rho_{ward\to step}WARD")
 
         eqs.append(r"\frac{dWARD}{dt} = " + " + ".join(inflow)
                    + " - (" + " + ".join(outflow) + ")")
@@ -61,8 +61,8 @@ def build_equations(units):
         if "ICU" in units:
             inflow.append(r"\rho_{ICU\to step}ICU")
 
-        # if "WARD" in units:
-        #     inflow.append(r"\rho_{ward\to step}WARD")
+        if "WARD" in units:
+            inflow.append(r"\rho_{ward\to step}WARD")
 
         outflow = [r"\mu_{step}STEP"]
 

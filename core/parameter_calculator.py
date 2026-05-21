@@ -86,6 +86,7 @@ def compute_parameters_from_entry(values, selected_units):
         # varphi
         params["ward_discharge_rate"] = float(values.get('ward_discharges')) / ward_beds
         params["ward_to_ICU_rate"] = float(values.get('ward_to_ICU')) / ward_beds
+        params["ward_to_step_rate"] = float(values.get('ward_to_step', 0)) / ward_beds
         params["ward_direct_admission_avg"]= values.get("ward_direct_admission")
         params["ward_transfer_admission_avg"] = values.get("ward_transfer_admission")
 
@@ -245,6 +246,13 @@ def compute_parameters_from_excel(df, selected_units):
             params["ward_to_ICU_rate"] = float(df['ward_to_ICU'].sum()) / ward_beds
         else:
             params["ward_to_ICU_rate"] = 2.98 / ward_beds
+
+        # Ward to Step-down rate
+        if 'ward_to_step' in df.columns:
+            params["ward_to_step_rate"] = float(df['ward_to_step'].sum()) / ward_beds
+        else:
+            params["ward_to_step_rate"] = 0.0
+
 
         # Direct and transfer admissions
         if 'ward_direct_admission' in df.columns:

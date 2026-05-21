@@ -147,9 +147,24 @@ def get_operational_inputs(required_data,selected_units, mode):
                 param_to_unit[param] = unit
 
         # Add conditional transfers to ED unit
-        conditional_transfers = ['ED_to_ward_admissions', 'ED_to_stepdown_admissions', 'ED_to_ICU_admissions']
-        for param in conditional_transfers:
-            param_to_unit[param] = 'ED'
+        # conditional_transfers = ['ED_to_ward_admissions', 'ED_to_stepdown_admissions', 'ED_to_ICU_admissions']
+        # for param in conditional_transfers:
+        #     param_to_unit[param] = 'ED'
+
+        conditional_transfers = {
+            'ED_to_ward_admissions': 'ED',
+            'ED_to_stepdown_admissions': 'ED',
+            'ED_to_ICU_admissions': 'ED',
+            'ward_to_ICU': 'WARD',
+            'ward_to_step': 'WARD',
+            'stepdown_to_ICU': 'STEP',
+            'stepdown_to_ward': 'STEP',
+            'ICU_to_ward': 'ICU',
+            'ICU_to_stepdown': 'ICU',
+        }
+        for param, unit in conditional_transfers.items():
+            param_to_unit[param] = unit
+
 
         # Group required_data by unit
         params_by_unit = {}
@@ -249,11 +264,23 @@ def get_required_data(selected_units, mode):
         required_data.update(base_data.get(u, []))
 
     # Add conditional transfers
+    # transfers = [
+    #     ("ED", "WARD", "ED_to_ward_admissions"),
+    #     ("ED", "STEP", "ED_to_stepdown_admissions"),
+    #     ("ED", "ICU", "ED_to_ICU_admissions")
+    # ]
     transfers = [
         ("ED", "WARD", "ED_to_ward_admissions"),
         ("ED", "STEP", "ED_to_stepdown_admissions"),
-        ("ED", "ICU", "ED_to_ICU_admissions")
+        ("ED", "ICU", "ED_to_ICU_admissions"),
+        ("WARD", "ICU", "ward_to_ICU"),
+        ("WARD", "STEP", "ward_to_step"),
+        ("STEP", "ICU", "stepdown_to_ICU"),
+        ("STEP", "WARD", "stepdown_to_ward"),
+        ("ICU", "WARD", "ICU_to_ward"),
+        ("ICU", "STEP", "ICU_to_stepdown")
     ]
+
 
     for a, b, name in transfers:
         if a in selected_units and b in selected_units:

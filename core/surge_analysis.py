@@ -71,6 +71,8 @@ def build_jacobian(params, selected_units):
 
             if "WARD" in inpatient_units:
                 J[i, i] -= params.get("step_to_ward_rate", 0)
+                j = unit_to_idx["WARD"]  # new connection---------
+                J[i, j] += params.get("ward_to_step_rate", 0)
 
 
         elif unit == "WARD":
@@ -81,13 +83,14 @@ def build_jacobian(params, selected_units):
             if "ICU" in inpatient_units:
                 J[i, i] -= params.get("ward_to_ICU_rate", 0)
 
-            # Inflows from other units (positive off-diagonal) # From ICU to WARD
 
+            # Inflows from other units (positive off-diagonal) # From ICU to WARD
                 j = unit_to_idx["ICU"]
                 J[i, j] += params.get("ICU_to_ward_rate", 0)
 
             # From STEP to WARD
             if "STEP" in inpatient_units:
+                J[i, i] -= params.get("ward_to_step_rate", 0) # new connection---------
                 j = unit_to_idx["STEP"]
                 J[i, j] += params.get("step_to_ward_rate", 0)
 
@@ -202,6 +205,14 @@ def solve_equilibrium_with_surge(units: List[str], params: Dict, values: Dict,
                 if "ICU" in inpatient_units:
                     j = unit_index["ICU"]
                     rho = params.get("ICU_to_step_rate", 0)
+                    A[i, j] -= rho
+                    A[j, j] += rho
+
+                # WARD → STEP  <-- ADD THIS
+                if "WARD" in inpatient_units:
+                    j = unit_index["WARD"]
+                    rho = params.get("ward_to_step_rate", 0)
+
                     A[i, j] -= rho
                     A[j, j] += rho
 

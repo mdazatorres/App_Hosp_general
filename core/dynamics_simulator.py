@@ -74,6 +74,9 @@ def simulate_dynamics(units, params, values, days=30):
             if "ICU" in units:
                 ICU = y[labels.index("ICU")]
                 inflow += params.get("ICU_to_step_rate",0)*ICU
+            if "WARD" in units:
+                WARD = y[labels.index("WARD")]
+                inflow += params.get("ward_to_step_rate", 0) * WARD
 
             outflow = params.get("step_discharge_rate",0)*STEP
 
@@ -113,6 +116,10 @@ def simulate_dynamics(units, params, values, days=30):
 
             if "ICU" in units:
                 outflow += params.get("ward_to_ICU_rate",0)*WARD
+
+            if "STEP" in units:
+                outflow += params.get("ward_to_step_rate",0)*WARD
+
 
             dWARD = inflow - outflow
             dydt.append(dWARD)

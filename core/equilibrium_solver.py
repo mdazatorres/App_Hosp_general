@@ -95,6 +95,13 @@ def solve_equilibrium(units, params, values):
                     A[i, j] -= rho
                     A[j, j] += rho
 
+                    # WARD -> STEP
+                if "WARD" in inpatient_units:
+                    j = unit_index["WARD"]
+                    rho = params.get("ward_to_step_rate", 0)
+                    A[i, j] -= rho
+                    A[j, j] += rho
+
 
             # ---------- External inflow ----------
             if u == "WARD":
