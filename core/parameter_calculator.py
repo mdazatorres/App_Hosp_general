@@ -85,10 +85,21 @@ def compute_parameters_from_entry(values, selected_units):
         ward_beds = max(ward_beds, 1)
         # varphi
         params["ward_discharge_rate"] = float(values.get('ward_discharges')) / ward_beds
-        params["ward_to_ICU_rate"] = float(values.get('ward_to_ICU')) / ward_beds
-        params["ward_to_step_rate"] = float(values.get('ward_to_step', 0)) / ward_beds
         params["ward_direct_admission_avg"]= values.get("ward_direct_admission")
         params["ward_transfer_admission_avg"] = values.get("ward_transfer_admission")
+
+        #params["ward_to_ICU_rate"] = float(values.get('ward_to_ICU')) / ward_beds
+        #params["ward_to_step_rate"] = float(values.get('ward_to_step', 0)) / ward_beds
+
+        if "ICU" in selected_units:
+            params["ward_to_ICU_rate"] = float(values.get('ward_to_ICU', 0)) / ward_beds
+        else:
+            params["ward_to_ICU_rate"] = 0.0
+
+        if "STEP" in selected_units:
+            params["ward_to_step_rate"] = float(values.get('ward_to_step', 0)) / ward_beds
+        else:
+            params["ward_to_step_rate"] = 0.0
 
 
     # ===== STEP-DOWN PARAMETERS =====
@@ -98,11 +109,20 @@ def compute_parameters_from_entry(values, selected_units):
         step_beds = max(step_beds, 1)
         # varphi
         params["step_discharge_rate"] = float(values.get('stepdown_discharges', 12)) / step_beds
-        params["step_to_ICU_rate"] = float(values.get("stepdown_to_ICU", 1)) / step_beds
-        params["step_to_ward_rate"] = float(values.get("stepdown_to_ward", 1)) / step_beds
         params["stepdown_direct_admission_avg"] = values.get("stepdown_direct_admission")
         params["stepdown_transfer_admission_avg"] = values.get("stepdown_transfer_admission")
 
+        #params["step_to_ICU_rate"] = float(values.get("stepdown_to_ICU", 1)) / step_beds
+        #params["step_to_ward_rate"] = float(values.get("stepdown_to_ward", 1)) / step_beds
+        if "ICU" in selected_units:
+            params["step_to_ICU_rate"] = float(values.get("stepdown_to_ICU", 0)) / step_beds
+        else:
+            params["step_to_ICU_rate"] = 0.0
+
+        if "WARD" in selected_units:
+            params["step_to_ward_rate"] = float(values.get("stepdown_to_ward", 0)) / step_beds
+        else:
+            params["step_to_ward_rate"] = 0.0
 
 
     # ===== ICU PARAMETERS =====
@@ -111,13 +131,23 @@ def compute_parameters_from_entry(values, selected_units):
         icu_beds = max(icu_beds, 1)
 
         params["ICU_discharge_rate"] = float(values.get('ICU_discharges', 6)) / icu_beds
-        params["ICU_to_ward_rate"] = float(values.get('ICU_to_ward', 3)) / icu_beds
-        params["ICU_to_step_rate"] = float(values.get('ICU_to_stepdown', 3)) / icu_beds
         params["ICU_direct_admission_avg"] = values.get("ICU_direct_admission")
         params["ICU_transfer_admission_avg"] = values.get("ICU_transfer_admission")
 
+       # params["ICU_to_ward_rate"] = float(values.get('ICU_to_ward', 3)) / icu_beds
+       # params["ICU_to_step_rate"] = float(values.get('ICU_to_stepdown', 3)) / icu_beds
+
         #params["ICU_to_ward_rate"] = float(values.get('ICU_transf', 3)) / icu_beds
         #params["ICU_to_step_rate"] = params["ICU_to_ward_rate"] * 0.3  # Estimate
+        if "WARD" in selected_units:
+            params["ICU_to_ward_rate"] = float(values.get('ICU_to_ward', 0)) / icu_beds
+        else:
+            params["ICU_to_ward_rate"] = 0.0
+
+        if "STEP" in selected_units:
+            params["ICU_to_step_rate"] = float(values.get('ICU_to_stepdown', 0)) / icu_beds
+        else:
+            params["ICU_to_step_rate"] = 0.0
 
     return params
 

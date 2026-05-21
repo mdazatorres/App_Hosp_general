@@ -23,27 +23,27 @@ BASE_DATA = {
             "ICU_transfer_admission"]
 }
 
-BASE_DATA_MANUAL = {
-    "ED": ["daily_ED_arrivals", "left_without_being_seen", "avg_ED_wait_time",
-           "avg_ED_boarding_time", "avg_ED_treatment_time",  "total_adm_from_ED"],
-    "WARD": ["ward_occupied_beds", "ward_discharges", "ward_direct_admission",
-             "ward_transfer_admission", "ward_to_ICU", "ward_to_step"],
-    "STEP": ["stepdown_occupied_beds", "stepdown_discharges", "stepdown_direct_admission",
-             "stepdown_transfer_admission", "stepdown_to_ICU", "stepdown_to_ward"],
-    "ICU": ["ICU_occupied_beds", "ICU_discharges", "ICU_direct_admission",
-            "ICU_transfer_admission", 'ICU_to_stepdown', 'ICU_to_ward']
-}
-
 # BASE_DATA_MANUAL = {
 #     "ED": ["daily_ED_arrivals", "left_without_being_seen", "avg_ED_wait_time",
 #            "avg_ED_boarding_time", "avg_ED_treatment_time",  "total_adm_from_ED"],
 #     "WARD": ["ward_occupied_beds", "ward_discharges", "ward_direct_admission",
-#              "ward_transfer_admission"],
+#              "ward_transfer_admission", "ward_to_ICU", "ward_to_step"],
 #     "STEP": ["stepdown_occupied_beds", "stepdown_discharges", "stepdown_direct_admission",
-#              "stepdown_transfer_admission"],
+#              "stepdown_transfer_admission", "stepdown_to_ICU", "stepdown_to_ward"],
 #     "ICU": ["ICU_occupied_beds", "ICU_discharges", "ICU_direct_admission",
-#             "ICU_transfer_admission"]
+#             "ICU_transfer_admission", 'ICU_to_stepdown', 'ICU_to_ward']
 # }
+
+BASE_DATA_MANUAL = {
+    "ED": ["daily_ED_arrivals", "left_without_being_seen", "avg_ED_wait_time",
+           "avg_ED_boarding_time", "avg_ED_treatment_time",  "total_adm_from_ED"],
+    "WARD": ["ward_occupied_beds", "ward_discharges", "ward_direct_admission",
+             "ward_transfer_admission"],
+    "STEP": ["stepdown_occupied_beds", "stepdown_discharges", "stepdown_direct_admission",
+             "stepdown_transfer_admission"],
+    "ICU": ["ICU_occupied_beds", "ICU_discharges", "ICU_direct_admission",
+            "ICU_transfer_admission"]
+}
 # I think I just need one dictionary
 
 # Data dictionary with explanations
