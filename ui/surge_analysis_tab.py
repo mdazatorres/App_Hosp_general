@@ -146,21 +146,57 @@ def capacity_gap_assessment(unit_order, peak_extra_beds_per_comp, peak_extra_bed
     }
 
 
+# def _render_pdf_download_button(selected_units, params):
+#     if 'surge_results' not in st.session_state or 'surge_metrics' not in st.session_state:
+#         return
+#
+#     from core.report_generator import build_surge_report_pdf
+#     from core.surge_analysis import build_surge_response_figure
+#
+#     results = st.session_state['surge_results']
+#     surge_metrics = st.session_state['surge_metrics']
+#     surge_specs = st.session_state.get('last_surge_specs', {})
+#     simulation_end_days = st.session_state.get('last_t_end', 0.0)
+#     capacity_summary = st.session_state.get('last_capacity_summary')
+#     fig = build_surge_response_figure(results)
+#
+#     try:
+#         pdf_bytes = build_surge_report_pdf(
+#             selected_units=selected_units,
+#             surge_specs=surge_specs,
+#             results=results,
+#             surge_metrics=surge_metrics,
+#             params=params,
+#             simulation_end_days=simulation_end_days,
+#             fig=fig,
+#             capacity_summary=capacity_summary,
+#         )
+#     except Exception as exc:
+#         st.warning(f"PDF export is not available right now: {exc}")
+#         return
+#
+#     st.download_button(
+#         label="📄 Download PDF Report",
+#         data=pdf_bytes,
+#         file_name="surge_scenario_report.pdf",
+#         mime="application/pdf",
+#         use_container_width=False,
+#     )
 def _render_pdf_download_button(selected_units, params):
     if 'surge_results' not in st.session_state or 'surge_metrics' not in st.session_state:
         return
 
-    from core.report_generator import build_surge_report_pdf
-    from core.surge_analysis import build_surge_response_figure
-
-    results = st.session_state['surge_results']
-    surge_metrics = st.session_state['surge_metrics']
-    surge_specs = st.session_state.get('last_surge_specs', {})
-    simulation_end_days = st.session_state.get('last_t_end', 0.0)
-    capacity_summary = st.session_state.get('last_capacity_summary')
-    fig = build_surge_response_figure(results)
-
     try:
+        from core.report_generator import build_surge_report_pdf
+        from core.surge_analysis import build_surge_response_figure
+
+        results = st.session_state['surge_results']
+        surge_metrics = st.session_state['surge_metrics']
+        surge_specs = st.session_state.get('last_surge_specs', {})
+        simulation_end_days = st.session_state.get('last_t_end', 0.0)
+        capacity_summary = st.session_state.get('last_capacity_summary')
+        fig = build_surge_response_figure(results)
+
         pdf_bytes = build_surge_report_pdf(
             selected_units=selected_units,
             surge_specs=surge_specs,

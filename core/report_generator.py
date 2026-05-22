@@ -5,6 +5,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
+from reportlab.lib.utils import ImageReader
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
@@ -121,7 +122,20 @@ def build_surge_report_pdf(
     try:
         fig_bytes = _plotly_fig_to_png_bytes(fig)
         fig_buffer = BytesIO(fig_bytes)
-        story.append(Image(fig_buffer, width=6.8 * inch, height=4.8 * inch))
+        img_reader = ImageReader(fig_buffer)
+        img_width, img_height = img_reader.getSize()
+
+        max_width = 6.8 * inch
+        max_height = 8.0 * inch
+        scale = min(max_width / img_width, max_height / img_height)
+
+        story.append(
+            Image(
+                fig_buffer,
+                width=img_width * scale,
+                height=img_height * scale,
+            )
+        )
     except Exception:
         story.append(Paragraph("Plot image could not be embedded in the PDF in this environment.", styles["BodyText"]))
     story.append(Spacer(1, 0.2 * inch))
