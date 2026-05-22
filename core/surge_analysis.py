@@ -389,8 +389,7 @@ def transient_response_for_multi_surge(units: List[str], params: Dict, values: D
 
 
 
-def plot_surge_response(results: Dict[str, Any]):
-
+def build_surge_response_figure(results: Dict[str, Any]):
     times = results['times']
     x_ts = results['x_ts']
     x0 = results['x0']
@@ -480,6 +479,11 @@ def plot_surge_response(results: Dict[str, Any]):
         hovermode='x unified'  # 🔥 synchronized daily view
     )
 
+    return fig
+
+
+def plot_surge_response(results: Dict[str, Any]):
+    fig = build_surge_response_figure(results)
     st.plotly_chart(fig, use_container_width=True)
 
 

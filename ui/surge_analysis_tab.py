@@ -136,7 +136,52 @@ def capacity_gap_assessment(unit_order, peak_extra_beds_per_comp, peak_extra_bed
           """)
 
 
-    #return available_beds, baseline_occupancy
+    return {
+        "available_beds": available_beds,
+        "baseline_occupancy": baseline_occupancy,
+        "capacity_deficit": capacity_deficit,
+        "has_deficit": has_deficit,
+        "peak_extra_beds_total": peak_extra_beds_total,
+        "peak_extra_beds_per_comp": peak_extra_beds_per_comp,
+    }
+
+
+def _render_pdf_download_button(selected_units, params):
+    if 'surge_results' not in st.session_state or 'surge_metrics' not in st.session_state:
+        return
+
+    from core.report_generator import build_surge_report_pdf
+    from core.surge_analysis import build_surge_response_figure
+
+    results = st.session_state['surge_results']
+    surge_metrics = st.session_state['surge_metrics']
+    surge_specs = st.session_state.get('last_surge_specs', {})
+    simulation_end_days = st.session_state.get('last_t_end', 0.0)
+    capacity_summary = st.session_state.get('last_capacity_summary')
+    fig = build_surge_response_figure(results)
+
+    try:
+        pdf_bytes = build_surge_report_pdf(
+            selected_units=selected_units,
+            surge_specs=surge_specs,
+            results=results,
+            surge_metrics=surge_metrics,
+            params=params,
+            simulation_end_days=simulation_end_days,
+            fig=fig,
+            capacity_summary=capacity_summary,
+        )
+    except Exception as exc:
+        st.warning(f"PDF export is not available right now: {exc}")
+        return
+
+    st.download_button(
+        label="📄 Download PDF Report",
+        data=pdf_bytes,
+        file_name="surge_scenario_report.pdf",
+        mime="application/pdf",
+        use_container_width=False,
+    )
 
 
 
@@ -229,6 +274,8 @@ def render_surge_analysis_tab(selected_units: List[str], params: Dict, values: D
 
                 st.session_state['surge_results'] = results
                 st.session_state['surge_metrics'] = metrics_surge_response(results)
+                st.session_state['last_surge_specs'] = surge_specs
+                st.session_state['last_t_end'] = t_end
                 #st.success("✅ Simulation complete!")
 
 
@@ -248,14 +295,16 @@ def render_surge_analysis_tab(selected_units: List[str], params: Dict, values: D
         #st.subheader("Step 3: Assess Your Capacity Gap")
         #st.caption("Now enter your available surge beds to see if you have enough capacity")
 
-        capacity_gap_assessment(unit_order=results['unit_order'], peak_extra_beds_per_comp=surge_metrics['peak_extra_beds_per_comp'],
+        capacity_summary = capacity_gap_assessment(unit_order=results['unit_order'], peak_extra_beds_per_comp=surge_metrics['peak_extra_beds_per_comp'],
                                peak_extra_beds_total=surge_metrics['peak_extra_beds_total'], params=params)
+        st.session_state['last_capacity_summary'] = capacity_summary
+        st.markdown("---")
+        _render_pdf_download_button(selected_units, params)
 
 
 
     else:
         st.warning("Please define at least one surge event")
     return
-
 
 
