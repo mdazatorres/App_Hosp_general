@@ -83,10 +83,26 @@ def get_operational_inputs(required_data,selected_units, mode):
                     # Option to use defaults for missing columns
                         # Option to proceed or cancel
                     col_btn1, col_btn2 = st.sidebar.columns(2)
-                    with col_btn1:
-                        if st.button("✅ Proceed with defaults", type="primary", use_container_width=True):
-                            st.session_state['use_defaults_for_missing'] = True
-                            st.rerun()
+                    # with col_btn1:
+                    #         if st.button("✅ Proceed with defaults", type="primary", use_container_width=True):
+                    #             st.session_state['use_defaults_for_missing'] = True
+                    #             st.session_state['uploaded_df'] = df
+                    #             st.session_state['data_ready'] = True
+                    #             st.rerun()
+                    if st.button("✅ Proceed with defaults", type="primary", use_container_width=True):
+                        df_filled = df.copy()
+                        for col in missing_cols:
+                            df_filled[col] = DEFAULT_VALUES.get(col, 0.0)
+
+                        st.session_state['uploaded_df'] = df_filled
+                        st.session_state['data_ready'] = True
+                        st.session_state['use_defaults_for_missing'] = True
+                        st.rerun()
+
+                    # with col_btn1:
+                    #     if st.button("✅ Proceed with defaults", type="primary", use_container_width=True):
+                    #         st.session_state['use_defaults_for_missing'] = True
+                    #         st.rerun()
                     with col_btn2:
                         if st.button("❌ Cancel upload", type="secondary", use_container_width=True):
                             st.session_state['uploaded_df'] = None

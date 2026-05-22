@@ -21,7 +21,9 @@ def process_input_data(required_data: set, selected_units: list, mode: str) -> T
         return _process_uploaded_data(st.session_state['uploaded_df'], selected_units)
 
     # Check if we have manual entry values
-    elif values and any(v != 0 for v in values.values()):
+    # elif values and any(v != 0 for v in values.values()):
+    #     return _process_manual_data(values, selected_units)
+    elif values:
         return _process_manual_data(values, selected_units)
 
     # Default mode

@@ -750,10 +750,10 @@ def run_example_test():
                                                     At_ICU_mean=params['ICU_transfer_admission_avg'])
 
     print('Baseline equilibrium:')
-    print(f'WARD= {ts_results['x0'][1]}', f'\nSTEP= {ts_results['x0'][0]}', f'\nICU= {ts_results['x0'][2]}')
+    print(f"WARD= {ts_results['x0'][1]}", f"\nSTEP= {ts_results['x0'][0]}", f"\nICU= {ts_results['x0'][2]}")
 
     print('Surge response results:')
-    print(f'STEP= {ts_results['extra_beddays_per_comp']['Hs']}', f'\n WARD= {ts_results['extra_beddays_per_comp']['Hm']}', f'\nICU= {ts_results['extra_beddays_per_comp']['I']}')
+    print(f"STEP= {ts_results['extra_beddays_per_comp']['Hs']}", f"\nWARD= {ts_results['extra_beddays_per_comp']['Hm']}", f"\nICU= {ts_results['extra_beddays_per_comp']['I']}")
 
     #print(ts_results['extra_beddays_per_comp']
     #ts_results['x0'])

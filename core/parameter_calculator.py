@@ -32,7 +32,7 @@ def compute_parameters_from_entry(values, selected_units):
         mean_wait = max(mean_wait_min * MIN2DAY, 1e-6)
         params["sigma"] = 1.0 / max(mean_wait, 1e-6)
 
-        mean_treatment_min = float(values.get('avg_ED_treatment_time_min', 159.0))  # 2.65 hours = 159 min
+        mean_treatment_min = float(values.get('avg_ED_treatment_time', 159.0))  # 2.65 hours = 159 min
         mean_treatment = max(mean_treatment_min * MIN2DAY, 1e-6)
         params["gamma"] = 1.0 / max(mean_treatment, 1e-6)
 
@@ -318,8 +318,8 @@ def compute_parameters_from_excel(df, selected_units):
         # Step-down to Ward rate
         if 'stepdown_to_ward' in df.columns:
             # comment this line is just for the synthetic example, and uncommented the line below
-            params["step_to_ward_rate"] = float(df['stepdown_to_ward'].mean()) / float(df['stepdown_occupied_beds'].mean())
-            #params["step_to_ward_rate"] = float(df['stepdown_to_ward'].sum()) / step_beds
+            #params["step_to_ward_rate"] = float(df['stepdown_to_ward'].mean()) / float(df['stepdown_occupied_beds'].mean())
+            params["step_to_ward_rate"] = float(df['stepdown_to_ward'].sum()) / step_beds
         else:
             params["step_to_ward_rate"] = 3.52 / step_beds
 
@@ -361,9 +361,17 @@ def compute_parameters_from_excel(df, selected_units):
             params["ICU_to_step_rate"] = 0.1 / icu_beds
 
         # Direct and transfer admissions
+        # if 'ICU_direct_admission' in df.columns:
+        #     #params["ICU_direct_admission_avg"] = float(df['ICU_direct_admission'].mean())
+        #     params["ICU_direct_admission_avg"] = df.loc[df['ICU_direct_admission'] != 0, 'ICU_direct_admission'].median()
+        # else:
+        #     params["ICU_direct_admission_avg"] = 2.09
         if 'ICU_direct_admission' in df.columns:
-            #params["ICU_direct_admission_avg"] = float(df['ICU_direct_admission'].mean())
-            params["ICU_direct_admission_avg"] = df.loc[df['ICU_direct_admission'] != 0, 'ICU_direct_admission'].median()
+            nonzero_icu_direct = df.loc[df['ICU_direct_admission'] != 0, 'ICU_direct_admission']
+            if not nonzero_icu_direct.empty:
+                params["ICU_direct_admission_avg"] = float(nonzero_icu_direct.median())
+            else:
+                params["ICU_direct_admission_avg"] = 0.0
         else:
             params["ICU_direct_admission_avg"] = 2.09
 
