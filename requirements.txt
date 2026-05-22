@@ -6,4 +6,5 @@ scipy
 openpyxl
 networkx
 reportlab
-kaleido
+kaleido==0.2.1
+
